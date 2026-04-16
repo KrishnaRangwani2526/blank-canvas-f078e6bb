@@ -16,6 +16,51 @@ import { useSkillExtractor } from "@/hooks/useSkillExtractor";
 import { formatTechStackForStorage, isGitHubRepoLink, joinTechStack, normalizeTechStack, saveExtractedSkills } from "@/lib/profile-data";
 import { toast } from "sonner";
 
+type ProjectFormState = {
+  title: string;
+  description: string;
+  tech_stack: string;
+  github_link?: string;
+  project_link?: string;
+  start_date: string;
+};
+
+interface FormCardProps {
+  title: string;
+  form: ProjectFormState;
+  saving: boolean;
+  icon: typeof GitBranch;
+  linkLabel: string;
+  onSave: () => void;
+  onCancel: () => void;
+  onChange: (field: keyof ProjectFormState, value: string) => void;
+}
+
+const ProjectFormCard = ({ title, icon: Icon, form, saving, linkLabel, onSave, onCancel, onChange }: FormCardProps) => {
+  const linkField = linkLabel === "GitHub Repo Link" ? "github_link" : "project_link";
+
+  return (
+    <Card className="animate-fade-in">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Icon className="h-5 w-5 text-primary" /> {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Input placeholder="Title *" value={form.title} onChange={(e) => onChange("title", e.target.value)} />
+        <Textarea placeholder="Description" value={form.description} onChange={(e) => onChange("description", e.target.value)} rows={3} />
+        <Input placeholder="Tech Stack (comma separated)" value={form.tech_stack} onChange={(e) => onChange("tech_stack", e.target.value)} />
+        <Input placeholder={linkLabel} value={form[linkField] || ""} onChange={(e) => onChange(linkField, e.target.value)} />
+        <Input type="date" placeholder="Date" value={form.start_date} onChange={(e) => onChange("start_date", e.target.value)} />
+        <div className="flex gap-2">
+          <Button type="button" onClick={onSave} disabled={saving}>{saving ? "Saving..." : title === "Add GitHub Repo" ? "Add Repo" : "Add Project"}</Button>
+          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const ProjectsPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { projects, refetch } = useProfile();
@@ -107,27 +152,13 @@ const ProjectsPage = () => {
     finally { setDeletingProj(null); }
   };
 
-  const FormCard = ({ title, icon: Icon, form, setForm, onSave, onCancel, linkLabel }: any) => (
-    <Card className="animate-fade-in">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Icon className="h-5 w-5 text-primary" /> {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <Input placeholder="Title *" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-        <Textarea placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
-        <Input placeholder="Tech Stack (comma separated)" value={form.tech_stack} onChange={e => setForm({ ...form, tech_stack: e.target.value })} />
-        <Input placeholder={linkLabel} value={form[linkLabel === "GitHub Repo Link" ? "github_link" : "project_link"]}
-          onChange={e => setForm({ ...form, [linkLabel === "GitHub Repo Link" ? "github_link" : "project_link"]: e.target.value })} />
-        <Input type="date" placeholder="Date" value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })} />
-        <div className="flex gap-2">
-          <Button onClick={onSave} disabled={saving}>{saving ? "Saving..." : title === "Add GitHub Repo" ? "Add Repo" : "Add Project"}</Button>
-          <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const updateRepoForm = (field: keyof ProjectFormState, value: string) => {
+    setRepoForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const updateProjectForm = (field: keyof ProjectFormState, value: string) => {
+    setProjectForm((current) => ({ ...current, [field]: value }));
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,17 +189,21 @@ const ProjectsPage = () => {
 
             {/* Add Repo Form */}
             {showRepoForm && (
-              <FormCard
-                title="Add GitHub Repo" icon={GitBranch} form={repoForm} setForm={setRepoForm}
-                onSave={handleAddRepo} onCancel={() => setShowRepoForm(false)} linkLabel="GitHub Repo Link"
+               <ProjectFormCard
+                 title="Add GitHub Repo" icon={GitBranch} form={repoForm}
+                 saving={saving}
+                 onSave={handleAddRepo} onCancel={() => setShowRepoForm(false)} linkLabel="GitHub Repo Link"
+                 onChange={updateRepoForm}
               />
             )}
 
             {/* Add Project Form */}
             {showProjectForm && (
-              <FormCard
-                title="Add Project" icon={FolderGit2} form={projectForm} setForm={setProjectForm}
-                onSave={handleAddProject} onCancel={() => setShowProjectForm(false)} linkLabel="Project Link"
+               <ProjectFormCard
+                 title="Add Project" icon={FolderGit2} form={projectForm}
+                 saving={saving}
+                 onSave={handleAddProject} onCancel={() => setShowProjectForm(false)} linkLabel="Project Link"
+                 onChange={updateProjectForm}
               />
             )}
 
