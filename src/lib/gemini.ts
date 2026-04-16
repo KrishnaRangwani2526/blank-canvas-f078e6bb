@@ -5,7 +5,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 // Fallback checking to prevent crashes if key is somehow missing
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-export const geminiModel = genAI ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" }) : null;
+export const geminiModel = genAI ? genAI.getGenerativeModel({ model: "gemini-2.0-flash" }) : null;
 
 /**
  * Utility to generate JSON structured output using Gemini.
