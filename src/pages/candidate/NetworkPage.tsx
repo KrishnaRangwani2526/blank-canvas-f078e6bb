@@ -150,9 +150,15 @@ export default function NetworkPage() {
     sendMessageMutation.mutate(selectedUser.user_id);
   };
 
+  if (!user) return null;
+
   return (
-    <DashboardLayout>
-      <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="flex">
+        <LeftSidebar />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
