@@ -66,19 +66,27 @@ export function useAtsAnalyzer() {
         },
       };
 
-      const prompt = `You are an expert AI Resume and ATS Analyzer. Your task is to analyze the following candidate profile strictly.
+      const prompt = `You are a senior technical recruiter and career coach analyzing a real engineering candidate. Your job is to deliver SPECIFIC, EVIDENCE-BASED insights — never generic advice.
 
-Candidate Profile JSON:
+CANDIDATE PROFILE (raw data):
 ${JSON.stringify(profileContext, null, 2)}
 
-${jobRequirements ? `Job Requirements to match against:\n${jobRequirements}\n\n` : ''}
+${jobRequirements ? `TARGET JOB REQUIREMENTS:\n${jobRequirements}\n\n` : ''}
 
-IMPORTANT: Factor the streak data heavily into the score and consistency analysis. Higher GitHub/LeetCode/Aspiring streaks indicate strong consistency and active learning — boost the score and consistency_score accordingly. Low or zero streaks should lower consistency and produce specific recommendations to build daily habits.
-    
-Provide a detailed JSON response exactly matching this schema:
+ANALYSIS RULES (follow strictly):
+1. Reference the candidate's ACTUAL data by name — quote specific project titles, skill names, companies, and streak numbers.
+2. Every recommendation must be ACTIONABLE this week (e.g. "Refactor the '${projects[0]?.title || 'X'}' project README to highlight metrics" — not "improve your projects").
+3. Score breakdown details must EXPLAIN the score (e.g. "Scored 65/100 because while you list React and TypeScript, your projects don't demonstrate state management or testing — both expected at mid-level").
+4. Streak analysis: a streak of 0 means inactive; <7 = building habit; 7-21 = solid; >21 = excellent. Reference the actual numbers.
+5. The 'summary' field should be a thoughtful 2-3 sentence paragraph that reads like a recruiter wrote it after reviewing the profile — mention at least one concrete strength and one concrete gap.
+6. Recommendations: provide 5-7 prioritized items, each tying back to a specific gap in the candidate's data.
+7. Learning roadmap: 4-6 week-by-week steps that build on what the candidate already knows toward what they're missing.
+8. Avoid filler phrases like "consider improving" or "showcase your skills" — be concrete.
+
+Return JSON matching exactly:
 {
   "ats_score": number (0-100),
-  "summary": "overall summary",
+  "summary": "thoughtful 2-3 sentence recruiter-style overview citing specifics from the profile",
   "profile_summary": {
     "bio": "string",
     "top_skills": ["skill1", ...],
@@ -87,27 +95,28 @@ Provide a detailed JSON response exactly matching this schema:
     "experience_highlights": ["string"]
   },
   "score_breakdown": [
-    {"category": "Skills Quality & Relevance", "score": number, "max": 100, "detail": "string"},
-    {"category": "Project Depth & Impact", "score": number, "max": 100, "detail": "string"},
-    {"category": "Work Experience", "score": number, "max": 100, "detail": "string"},
-    {"category": "Coding Consistency (GitHub/LeetCode/Learning Streaks)", "score": number, "max": 100, "detail": "string referencing actual streak numbers"}
+    {"category": "Skills Quality & Relevance", "score": number, "max": 100, "detail": "specific reasoning citing actual skills"},
+    {"category": "Project Depth & Impact", "score": number, "max": 100, "detail": "specific reasoning citing actual project names"},
+    {"category": "Work Experience", "score": number, "max": 100, "detail": "specific reasoning citing companies/roles"},
+    {"category": "Coding Consistency (Streaks)", "score": number, "max": 100, "detail": "reference actual GitHub/LeetCode/Aspiring streak numbers"}
   ],
-  "profile_gaps": [{"area": "string", "severity": "high" | "medium" | "low", "detail": "string"}],
-  "strengths": ["string"],
-  "weaknesses": ["string"],
-  "consistency_score": number (0-100, derived from streaks),
-  "recommendations": ["actionable advice 1", ...],
-  "learning_roadmap": ["week 1 plan", ...],
+  "profile_gaps": [{"area": "specific gap", "severity": "high" | "medium" | "low", "detail": "why this matters and what's missing"}],
+  "strengths": ["specific strength tied to profile data"],
+  "weaknesses": ["specific weakness tied to profile data"],
+  "consistency_score": number (0-100, derived from streaks: 0 streak ≈ 20, 7+ ≈ 60, 21+ ≈ 85, 30+ ≈ 95),
+  "recommendations": ["specific actionable item 1", ...5-7 items],
+  "learning_roadmap": ["Week 1: specific action", "Week 2: ...", ...4-6 weeks],
   "streak_analysis": {
     "github_streak": ${streakData?.github?.streak ?? 0},
     "leetcode_streak": ${streakData?.leetcode?.streak ?? 0},
     "aspiring_streak": ${streakData?.aspiring?.streak ?? 0},
     "consistency_rating": "excellent" | "good" | "moderate" | "low",
-    "insight": "1-2 sentence insight about the candidate's consistency based on these streaks"
+    "insight": "thoughtful 2 sentence insight referencing the actual streak numbers and what they say about the candidate's habits"
   }
-  ${jobRequirements ? `, "match_percentage": number, "matched_skills": ["string"], "missing_skills": ["string"], "gap_analysis": "string"` : ''}
+  ${jobRequirements ? `, "match_percentage": number, "matched_skills": ["string"], "missing_skills": ["string"], "gap_analysis": "specific narrative explaining the fit"` : ''}
 }
-Limit score_breakdown categories to 3-5 critical areas. Make the response highly customized to the candidate's actual data. If the profile is largely empty, reflect that with a low score and basic advice. DO NOT INCLUDE MARKDOWN FORMATTING (like \`\`\`json) IN YOUR RESPONSE, JUST THE RAW JSON OBJECT.`;
+
+Return ONLY the raw JSON object — no markdown, no code fences, no commentary.`;
 
       const { generateJSONWithGemini } = await import("@/lib/gemini");
       const generatedResult = await generateJSONWithGemini(prompt);
