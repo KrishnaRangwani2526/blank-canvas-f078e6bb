@@ -37,10 +37,10 @@ const LearningPage = () => {
       const { error } = await supabase.from("learning_goals").insert({
         user_id: user!.id,
         title: form.title,
-        link: form.link,
-        deadline: form.deadline_end || null,
+        description: form.link,
+        target_date: form.deadline_end || null,
         proof: form.target_hours ? `Target: ${form.target_hours}hr/day | ${form.deadline_start} to ${form.deadline_end}` : null,
-        completed: false,
+        status: "in_progress",
       });
       if (error) throw error;
     },
@@ -55,8 +55,9 @@ const LearningPage = () => {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, completed }: { id: string; completed: boolean }) => {
-      const { error } = await supabase.from("learning_goals").update({ completed: !completed }).eq("id", id);
+    mutationFn: async ({ id, completed }: { id: string; completed: string }) => {
+      const newStatus = completed ? "in_progress" : "completed";
+      const { error } = await supabase.from("learning_goals").update({ status: newStatus }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -140,21 +141,21 @@ const LearningPage = () => {
             )}
 
             {goals.map((goal: any) => (
-              <Card key={goal.id} className={goal.completed ? "opacity-70" : ""}>
+              <Card key={goal.id} className={goal.status === "completed" ? "opacity-70" : ""}>
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className={`text-sm font-semibold text-card-foreground ${goal.completed ? "line-through" : ""}`}>
+                      <p className={`text-sm font-semibold text-card-foreground ${goal.status === "completed" ? "line-through" : ""}`}>
                         {goal.title}
                       </p>
-                      {goal.link && (
-                        <a href={goal.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary mt-1 hover:underline">
+                      {goal.description && (
+                        <a href={goal.description} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary mt-1 hover:underline">
                           <ExternalLink className="h-3 w-3" /> Learning Resource
                         </a>
                       )}
-                      {goal.deadline && (
+                      {goal.target_date && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                          <Clock className="h-3 w-3" /> Deadline: {goal.deadline}
+                          <Clock className="h-3 w-3" /> Deadline: {goal.target_date}
                         </div>
                       )}
                       {goal.proof && (
@@ -165,8 +166,8 @@ const LearningPage = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => toggleMutation.mutate({ id: goal.id, completed: goal.completed })}
-                        className={`p-1.5 rounded-md hover:bg-secondary transition-colors ${goal.completed ? "text-green-500" : "text-muted-foreground"}`}
+                        onClick={() => toggleMutation.mutate({ id: goal.id, completed: goal.status || "in_progress" })}
+                        className={`p-1.5 rounded-md hover:bg-secondary transition-colors ${goal.status === "completed" ? "text-green-500" : "text-muted-foreground"}`}
                       >
                         <CheckCircle2 className="h-4 w-4" />
                       </button>
