@@ -30,8 +30,8 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
 
   const openAdd = () => { resetForm(); setAdding(true); };
   const openEdit = (p: Tables<"projects">) => {
-    setTitle(p.title || ""); setDescription(p.description || ""); setLink(p.url || "");
-    setTechStack(Array.isArray(p.tech_stack) ? (p.tech_stack as string[]).join(", ") : ""); setStartDate(""); setEndDate("");
+    setTitle(p.title || ""); setDescription(p.description || ""); setLink(p.project_link || "");
+    setTechStack(p.tech_stack || ""); setStartDate(p.start_date || ""); setEndDate(p.end_date || "");
     setEditing(p);
   };
 
