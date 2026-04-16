@@ -14,41 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      applications: {
-        Row: {
-          cover_letter: string | null
-          created_at: string
-          id: string
-          job_id: string | null
-          status: string | null
-          user_id: string
-        }
-        Insert: {
-          cover_letter?: string | null
-          created_at?: string
-          id?: string
-          job_id?: string | null
-          status?: string | null
-          user_id: string
-        }
-        Update: {
-          cover_letter?: string | null
-          created_at?: string
-          id?: string
-          job_id?: string | null
-          status?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "applications_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       candidates: {
         Row: {
           about: string | null
@@ -58,10 +23,14 @@ export type Database = {
           education: Json | null
           email: string | null
           experience: Json | null
+          github_url: string | null
           id: string
-          name: string | null
+          kaggle_url: string | null
+          leetcode_url: string | null
+          name: string
           projects: Json | null
           skills: Json | null
+          updated_at: string
         }
         Insert: {
           about?: string | null
@@ -71,10 +40,14 @@ export type Database = {
           education?: Json | null
           email?: string | null
           experience?: Json | null
+          github_url?: string | null
           id?: string
-          name?: string | null
+          kaggle_url?: string | null
+          leetcode_url?: string | null
+          name?: string
           projects?: Json | null
           skills?: Json | null
+          updated_at?: string
         }
         Update: {
           about?: string | null
@@ -84,10 +57,14 @@ export type Database = {
           education?: Json | null
           email?: string | null
           experience?: Json | null
+          github_url?: string | null
           id?: string
-          name?: string | null
+          kaggle_url?: string | null
+          leetcode_url?: string | null
+          name?: string
           projects?: Json | null
           skills?: Json | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -95,28 +72,31 @@ export type Database = {
         Row: {
           created_at: string
           credential_url: string | null
+          description: string | null
           id: string
           issue_date: string | null
           issuer: string | null
-          name: string | null
+          title: string
           user_id: string
         }
         Insert: {
           created_at?: string
           credential_url?: string | null
+          description?: string | null
           id?: string
           issue_date?: string | null
           issuer?: string | null
-          name?: string | null
+          title: string
           user_id: string
         }
         Update: {
           created_at?: string
           credential_url?: string | null
+          description?: string | null
           id?: string
           issue_date?: string | null
           issuer?: string | null
-          name?: string | null
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -125,59 +105,38 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          email: string | null
+          email: string
           id: string
-          location: string | null
+          industry: string | null
           logo_url: string | null
-          name: string | null
+          name: string
+          updated_at: string
           user_id: string
           website: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
-          email?: string | null
+          email: string
           id?: string
-          location?: string | null
+          industry?: string | null
           logo_url?: string | null
-          name?: string | null
+          name: string
+          updated_at?: string
           user_id: string
           website?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
-          email?: string | null
+          email?: string
           id?: string
-          location?: string | null
+          industry?: string | null
           logo_url?: string | null
-          name?: string | null
+          name?: string
+          updated_at?: string
           user_id?: string
           website?: string | null
-        }
-        Relationships: []
-      }
-      connections: {
-        Row: {
-          created_at: string
-          id: string
-          recipient_id: string
-          requester_id: string
-          status: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          recipient_id: string
-          requester_id: string
-          status?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          recipient_id?: string
-          requester_id?: string
-          status?: string | null
         }
         Relationships: []
       }
@@ -188,7 +147,7 @@ export type Database = {
           end_date: string | null
           field_of_study: string | null
           id: string
-          school: string | null
+          school: string
           start_date: string | null
           user_id: string
         }
@@ -198,7 +157,7 @@ export type Database = {
           end_date?: string | null
           field_of_study?: string | null
           id?: string
-          school?: string | null
+          school: string
           start_date?: string | null
           user_id: string
         }
@@ -208,7 +167,7 @@ export type Database = {
           end_date?: string | null
           field_of_study?: string | null
           id?: string
-          school?: string | null
+          school?: string
           start_date?: string | null
           user_id?: string
         }
@@ -216,34 +175,37 @@ export type Database = {
       }
       employee_requests: {
         Row: {
-          company_id: string | null
+          company_id: string
           created_at: string
           department: string | null
-          email: string | null
+          email: string
           id: string
-          name: string | null
+          name: string
           role: string | null
-          status: string | null
+          status: string
+          updated_at: string
         }
         Insert: {
-          company_id?: string | null
+          company_id: string
           created_at?: string
           department?: string | null
-          email?: string | null
+          email: string
           id?: string
-          name?: string | null
+          name: string
           role?: string | null
-          status?: string | null
+          status?: string
+          updated_at?: string
         }
         Update: {
-          company_id?: string | null
+          company_id?: string
           created_at?: string
           department?: string | null
-          email?: string | null
+          email?: string
           id?: string
-          name?: string | null
+          name?: string
           role?: string | null
-          status?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -257,37 +219,40 @@ export type Database = {
       }
       employees: {
         Row: {
-          company_id: string | null
+          avatar_url: string | null
+          company_id: string
           created_at: string
           department: string | null
           email: string | null
           id: string
           joined_at: string | null
-          name: string | null
+          name: string
           role: string | null
-          status: string | null
+          status: string
         }
         Insert: {
-          company_id?: string | null
+          avatar_url?: string | null
+          company_id: string
           created_at?: string
           department?: string | null
           email?: string | null
           id?: string
           joined_at?: string | null
-          name?: string | null
+          name: string
           role?: string | null
-          status?: string | null
+          status?: string
         }
         Update: {
-          company_id?: string | null
+          avatar_url?: string | null
+          company_id?: string
           created_at?: string
           department?: string | null
           email?: string | null
           id?: string
           joined_at?: string | null
-          name?: string | null
+          name?: string
           role?: string | null
-          status?: string | null
+          status?: string
         }
         Relationships: [
           {
@@ -301,38 +266,38 @@ export type Database = {
       }
       experience: {
         Row: {
-          company: string | null
+          company: string
           created_at: string
           description: string | null
           end_date: string | null
           id: string
           is_current: boolean | null
           location: string | null
-          role: string | null
+          role: string
           start_date: string | null
           user_id: string
         }
         Insert: {
-          company?: string | null
+          company: string
           created_at?: string
           description?: string | null
           end_date?: string | null
           id?: string
           is_current?: boolean | null
           location?: string | null
-          role?: string | null
+          role: string
           start_date?: string | null
           user_id: string
         }
         Update: {
-          company?: string | null
+          company?: string
           created_at?: string
           description?: string | null
           end_date?: string | null
           id?: string
           is_current?: boolean | null
           location?: string | null
-          role?: string | null
+          role?: string
           start_date?: string | null
           user_id?: string
         }
@@ -340,28 +305,34 @@ export type Database = {
       }
       hr_members: {
         Row: {
-          company_id: string | null
+          avatar_url: string | null
+          company_id: string
           created_at: string
           email: string | null
           id: string
-          name: string | null
+          name: string
           role: string | null
+          status: string
         }
         Insert: {
-          company_id?: string | null
+          avatar_url?: string | null
+          company_id: string
           created_at?: string
           email?: string | null
           id?: string
-          name?: string | null
+          name: string
           role?: string | null
+          status?: string
         }
         Update: {
-          company_id?: string | null
+          avatar_url?: string | null
+          company_id?: string
           created_at?: string
           email?: string | null
           id?: string
-          name?: string | null
+          name?: string
           role?: string | null
+          status?: string
         }
         Relationships: [
           {
@@ -376,54 +347,57 @@ export type Database = {
       jobs: {
         Row: {
           ats_config: Json | null
-          company_id: string | null
+          company_id: string
           created_at: string
           description: string | null
           github_requirement: Json | null
           id: string
-          job_type: string | null
+          job_type: string
           kaggle_requirement: Json | null
           leetcode_requirement: Json | null
           location: string | null
           priority_order: Json | null
           requirements: Json | null
-          status: string | null
-          title: string | null
-          work_mode: string | null
+          status: string
+          title: string
+          updated_at: string
+          work_mode: string
         }
         Insert: {
           ats_config?: Json | null
-          company_id?: string | null
+          company_id: string
           created_at?: string
           description?: string | null
           github_requirement?: Json | null
           id?: string
-          job_type?: string | null
+          job_type: string
           kaggle_requirement?: Json | null
           leetcode_requirement?: Json | null
           location?: string | null
           priority_order?: Json | null
           requirements?: Json | null
-          status?: string | null
-          title?: string | null
-          work_mode?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          work_mode: string
         }
         Update: {
           ats_config?: Json | null
-          company_id?: string | null
+          company_id?: string
           created_at?: string
           description?: string | null
           github_requirement?: Json | null
           id?: string
-          job_type?: string | null
+          job_type?: string
           kaggle_requirement?: Json | null
           leetcode_requirement?: Json | null
           location?: string | null
           priority_order?: Json | null
           requirements?: Json | null
-          status?: string | null
-          title?: string | null
-          work_mode?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          work_mode?: string
         }
         Relationships: [
           {
@@ -438,259 +412,181 @@ export type Database = {
       learning_goals: {
         Row: {
           created_at: string
-          goal: string | null
+          description: string | null
           id: string
-          progress: number | null
           status: string | null
-          target_date: string | null
+          title: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          goal?: string | null
+          description?: string | null
           id?: string
-          progress?: number | null
           status?: string | null
-          target_date?: string | null
+          title: string
           user_id: string
         }
         Update: {
           created_at?: string
-          goal?: string | null
+          description?: string | null
           id?: string
-          progress?: number | null
           status?: string | null
-          target_date?: string | null
+          title?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      messages: {
-        Row: {
-          content: string | null
-          created_at: string
-          id: string
-          is_read: boolean | null
-          recipient_id: string
-          sender_id: string
-        }
-        Insert: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          recipient_id: string
-          sender_id: string
-        }
-        Update: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          recipient_id?: string
-          sender_id?: string
         }
         Relationships: []
       }
       notifications: {
         Row: {
+          company_id: string | null
           created_at: string
           id: string
-          is_read: boolean | null
-          message: string | null
+          is_read: boolean
+          message: string
           metadata: Json | null
-          type: string | null
-          user_id: string
+          type: string
+          user_id: string | null
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           id?: string
-          is_read?: boolean | null
-          message?: string | null
+          is_read?: boolean
+          message: string
           metadata?: Json | null
-          type?: string | null
-          user_id: string
+          type: string
+          user_id?: string | null
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           id?: string
-          is_read?: boolean | null
-          message?: string | null
+          is_read?: boolean
+          message?: string
           metadata?: Json | null
-          type?: string | null
-          user_id?: string
+          type?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
           about: string | null
           avatar_url: string | null
           bio: string | null
-          cover_url: string | null
           created_at: string
-          display_name: string | null
-          email: string | null
+          currently_learning: string | null
           full_name: string | null
           github_url: string | null
-          headline: string | null
           id: string
           kaggle_url: string | null
           leetcode_url: string | null
-          linkedin_url: string | null
           location: string | null
           open_to_work: boolean | null
-          phone: string | null
           seeking_type: string | null
           updated_at: string
           user_id: string
-          website: string | null
           work_mode: string | null
         }
         Insert: {
           about?: string | null
           avatar_url?: string | null
           bio?: string | null
-          cover_url?: string | null
           created_at?: string
-          display_name?: string | null
-          email?: string | null
+          currently_learning?: string | null
           full_name?: string | null
           github_url?: string | null
-          headline?: string | null
           id?: string
           kaggle_url?: string | null
           leetcode_url?: string | null
-          linkedin_url?: string | null
           location?: string | null
           open_to_work?: boolean | null
-          phone?: string | null
           seeking_type?: string | null
           updated_at?: string
           user_id: string
-          website?: string | null
           work_mode?: string | null
         }
         Update: {
           about?: string | null
           avatar_url?: string | null
           bio?: string | null
-          cover_url?: string | null
           created_at?: string
-          display_name?: string | null
-          email?: string | null
+          currently_learning?: string | null
           full_name?: string | null
           github_url?: string | null
-          headline?: string | null
           id?: string
           kaggle_url?: string | null
           leetcode_url?: string | null
-          linkedin_url?: string | null
           location?: string | null
           open_to_work?: boolean | null
-          phone?: string | null
           seeking_type?: string | null
           updated_at?: string
           user_id?: string
-          website?: string | null
           work_mode?: string | null
         }
         Relationships: []
-      }
-      project_comments: {
-        Row: {
-          content: string | null
-          created_at: string
-          id: string
-          project_id: string
-          user_id: string
-        }
-        Insert: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          project_id: string
-          user_id: string
-        }
-        Update: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          project_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_comments_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       projects: {
         Row: {
           created_at: string
           description: string | null
           end_date: string | null
-          github_url: string | null
           id: string
+          project_link: string | null
           start_date: string | null
-          tech_stack: Json | null
-          title: string | null
-          url: string | null
+          tech_stack: string | null
+          title: string
           user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
           end_date?: string | null
-          github_url?: string | null
           id?: string
+          project_link?: string | null
           start_date?: string | null
-          tech_stack?: Json | null
-          title?: string | null
-          url?: string | null
+          tech_stack?: string | null
+          title: string
           user_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
           end_date?: string | null
-          github_url?: string | null
           id?: string
+          project_link?: string | null
           start_date?: string | null
-          tech_stack?: Json | null
-          title?: string | null
-          url?: string | null
+          tech_stack?: string | null
+          title?: string
           user_id?: string
         }
         Relationships: []
       }
       skills: {
         Row: {
-          category: string | null
           created_at: string
           id: string
           name: string
-          percentage: number | null
           user_id: string
         }
         Insert: {
-          category?: string | null
           created_at?: string
           id?: string
           name: string
-          percentage?: number | null
           user_id: string
         }
         Update: {
-          category?: string | null
           created_at?: string
           id?: string
           name?: string
-          percentage?: number | null
           user_id?: string
         }
         Relationships: []

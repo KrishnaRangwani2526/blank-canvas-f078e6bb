@@ -50,16 +50,16 @@ export const rankingApi = {
           ? (job.requirements as any[]).map((r: any) => (typeof r === "string" ? r : r?.name || "")).filter(Boolean)
           : []);
 
-    const { data: applications } = await supabase
-      .from("applications")
-      .select("*")
-      .eq("job_id", request.job_id);
+    // Get candidates directly from the candidates sync table
+    const { data: allCandidates } = await supabase
+      .from("candidates")
+      .select("*");
 
-    if (!applications || applications.length === 0) {
+    if (!allCandidates || allCandidates.length === 0) {
       return { candidates: [] };
     }
 
-    const userIds = applications.map(a => a.user_id);
+    const userIds = allCandidates.map(a => a.id);
     const { data: profiles } = await supabase
       .from("profiles")
       .select("*")
@@ -81,7 +81,7 @@ export const rankingApi = {
       }
       return {
         id: profile.user_id,
-        name: profile.full_name || profile.display_name || "Unknown Applicant",
+        name: profile.full_name || "Unknown Applicant",
         skills: skillNames,
         platforms: {
           github: profile.github_url || undefined,
