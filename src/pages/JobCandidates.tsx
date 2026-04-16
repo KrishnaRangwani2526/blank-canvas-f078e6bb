@@ -150,6 +150,22 @@ export default function JobCandidatesPage() {
     }
   }, [job]);
 
+  // Realtime subscription: refresh when new applications arrive
+  useEffect(() => {
+    if (!jobId) return;
+    const channel = supabase
+      .channel(`applications-job-${jobId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'applications', filter: `job_id=eq.${jobId}` },
+        () => {
+          if (job) fetchRankedCandidates();
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [jobId, job]);
+
   const handleViewProfile = (candidateId: string) => {
     navigate(`/candidates/${candidateId}`);
   };
