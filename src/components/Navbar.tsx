@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Users, Briefcase, MessageSquare, Bell, ChevronDown, User, FileText, Brain, BarChart3, Code2, Plus, Settings, X, ExternalLink, Linkedin, Check } from "lucide-react";
+import { Search, Users, Briefcase, MessageSquare, Bell, ChevronDown, User, FileText, Brain, BarChart3, Code2, Plus, Settings, X, ExternalLink, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
