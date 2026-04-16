@@ -364,7 +364,7 @@ o
         projects: projects.map((p) => ({
           name: p.title,
           description: p.description || "",
-          tech: p.tech_stack || [],
+          tech: Array.isArray(p.tech_stack) ? p.tech_stack : typeof p.tech_stack === "string" ? p.tech_stack.split(",").map((s: string) => s.trim()).filter(Boolean) : [],
           link: p.project_link,
         })),
       });
