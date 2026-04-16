@@ -1,7 +1,7 @@
 import type { ATSResult } from "@/hooks/useAtsAnalyzer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp, AlertCircle, CheckCircle2, Github, Code2, Flame } from "lucide-react";
+import { Loader2, TrendingUp, AlertCircle, CheckCircle2, GitBranch, Code2, Flame } from "lucide-react";
 
 interface ATSResultModalProps {
   result: ATSResult | null;
@@ -101,7 +101,7 @@ export function ATSResultModal({ result, loading, title = "ATS Analysis" }: ATSR
           <CardContent className="space-y-3">
             <div className="grid grid-cols-3 gap-2">
               <div className="text-center p-2 rounded-lg bg-card border border-border">
-                <Github className="h-4 w-4 mx-auto mb-1 text-foreground" />
+                <GitBranch className="h-4 w-4 mx-auto mb-1 text-foreground" />
                 <p className="text-lg font-bold text-primary">{result.streak_analysis.github_streak}</p>
                 <p className="text-[10px] text-muted-foreground">GitHub</p>
               </div>
