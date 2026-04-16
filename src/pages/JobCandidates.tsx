@@ -134,7 +134,7 @@ export default function JobCandidatesPage() {
 
       // Save ranks and ATS scores back to applications table
       for (const c of ranked) {
-        const app = applications.find((a) => a.candidate_id === c.candidate_id);
+        const app = applications.find((a) => (a.candidate_id || a.user_id) === c.candidate_id);
         if (app) {
           await supabase
             .from("applications")
