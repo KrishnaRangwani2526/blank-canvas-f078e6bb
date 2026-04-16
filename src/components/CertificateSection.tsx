@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, forwardRef, useImperativeHandle } from "react";
-import { Plus, Award, Pencil, Brain, ExternalLink } from "lucide-react";
+import { Plus, Award, Pencil, Brain, ExternalLink, Image } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillExtractor } from "@/hooks/useSkillExtractor";
@@ -13,6 +13,11 @@ interface Props {
   certificates: Tables<"certificates">[];
   refetch: () => void;
 }
+
+const isImageUrl = (url: string | null) => {
+  if (!url) return false;
+  return /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(url) || url.includes('/storage/v1/object/public/');
+};
 
 const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certificates, refetch }, ref) => {
   const { user } = useAuth();
@@ -28,6 +33,7 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
   const [saving, setSaving] = useState(false);
   const [extractingCert, setExtractingCert] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const resetForm = () => { setTitle(""); setIssuer(""); setIssueDate(""); setDescription(""); setCredentialUrl(""); setFile(null); };
   const openAdd = () => { resetForm(); setAdding(true); };
@@ -61,17 +67,37 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
     }
 
     const data = { title, issuer, issue_date: issueDate || null, description: description || null, credential_url: finalUrl || null, user_id: user.id };
+    let savedCert = null;
     if (editing) {
       const { error } = await supabase.from("certificates").update(data).eq("id", editing.id);
       if (error) throw error;
       setEditing(null);
     } else {
-      const { error } = await supabase.from("certificates").insert(data).select().single();
+      const { data: newCert, error } = await supabase.from("certificates").insert(data).select().single();
       if (error) throw error;
+      savedCert = newCert;
       setAdding(false);
     }
     setSaving(false);
     refetch();
+
+    // Auto-extract skills after adding a new certificate
+    if (savedCert && !editing) {
+      try {
+        const content = `${savedCert.title || ""} ${savedCert.issuer || ""} ${savedCert.description || ""}`.trim();
+        if (content) {
+          toast.info("Scanning certificate for skills...");
+          const result = await extractSkills(content);
+          if (result?.skills?.length && user) {
+            const insertedCount = await saveExtractedSkills(user.id, result.skills);
+            refetch();
+            if (insertedCount > 0) toast.success(`Auto-extracted ${insertedCount} skills from certificate!`);
+          }
+        }
+      } catch (err) {
+        console.error("Auto skill extraction failed:", err);
+      }
+    }
   };
 
   const del = async (id: string) => {
@@ -143,9 +169,23 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
           <div className="space-y-4">
             {certificates.map((cert) => (
               <div key={cert.id} className="flex gap-3 group">
-                <div className="w-10 h-10 rounded-lg bg-rank-bg flex items-center justify-center flex-shrink-0">
-                  <Award className="h-5 w-5 text-rank-gold" />
-                </div>
+                {/* Certificate Image or Icon */}
+                {isImageUrl(cert.credential_url) ? (
+                  <button 
+                    onClick={() => setExpandedImage(cert.credential_url)}
+                    className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                  >
+                    <img 
+                      src={cert.credential_url!} 
+                      alt={cert.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-rank-bg flex items-center justify-center flex-shrink-0">
+                    <Award className="h-5 w-5 text-rank-gold" />
+                  </div>
+                )}
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-card-foreground">{cert.title}</p>
@@ -159,12 +199,11 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
                   </div>
                   {cert.issuer && <p className="text-sm text-muted-foreground">{cert.issuer}</p>}
                   {cert.issue_date && <p className="text-xs text-muted-foreground">Issued {cert.issue_date}</p>}
-                  {cert.credential_url && (
+                  {cert.credential_url && !isImageUrl(cert.credential_url) && (
                     <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary mt-1 hover:underline">
                       <ExternalLink className="h-3 w-3" /> View Credential
                     </a>
                   )}
-                  {/* Add Skill button - always visible */}
                   <button
                     onClick={() => handleExtractSkills(cert)}
                     disabled={extractingCert === cert.id}
@@ -179,6 +218,13 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {expandedImage && (
+        <div className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4" onClick={() => setExpandedImage(null)}>
+          <img src={expandedImage} alt="Certificate" className="max-w-full max-h-[90vh] rounded-xl shadow-2xl" />
+        </div>
+      )}
 
       <EditModal title={editing ? "Edit Certificate" : "Add Certificate"} open={adding || !!editing} onClose={() => { setAdding(false); setEditing(null); }}>
         {form}

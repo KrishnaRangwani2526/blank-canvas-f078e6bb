@@ -1,13 +1,16 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Users, Briefcase, MessageSquare, Bell, ChevronDown, User, FileText, Brain, BarChart3, Code2, Plus, Settings, X, ExternalLink } from "lucide-react";
+import { Search, Users, Briefcase, MessageSquare, Bell, ChevronDown, User, FileText, Brain, BarChart3, Code2, Plus, Settings, X, ExternalLink, Linkedin, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useStreakData } from "@/hooks/useStreakData";
 import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const StreakDots = ({ days }: { days: number[] }) => (
   <div className="flex gap-0.5 mt-1">
@@ -23,13 +26,20 @@ const Navbar = () => {
   const [githubOpen, setGithubOpen] = useState(false);
   const [leetcodeOpen, setLeetcodeOpen] = useState(false);
   const [kaggleOpen, setKaggleOpen] = useState(false);
+  const [linkedinOpen, setLinkedinOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
+  const [githubInput, setGithubInput] = useState("");
+  const [leetcodeInput, setLeetcodeInput] = useState("");
+  const [kaggleInput, setKaggleInput] = useState("");
+  const [linkedinInput, setLinkedinInput] = useState("");
+  const [savingPlatform, setSavingPlatform] = useState(false);
   const { user, signOut } = useAuth();
   const { data: notifications = [] } = useNotifications();
   const { data: streakData } = useStreakData();
   const { profile } = useProfile();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     await signOut();
@@ -39,17 +49,30 @@ const Navbar = () => {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setMeOpen(false);
-        setGithubOpen(false);
-        setLeetcodeOpen(false);
-        setKaggleOpen(false);
+        closeAll();
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const closeAll = () => { setMeOpen(false); setGithubOpen(false); setLeetcodeOpen(false); setKaggleOpen(false); };
+  const closeAll = () => { setMeOpen(false); setGithubOpen(false); setLeetcodeOpen(false); setKaggleOpen(false); setLinkedinOpen(false); };
+
+  const savePlatformUrl = async (field: string, value: string) => {
+    if (!user || !value.trim()) return;
+    setSavingPlatform(true);
+    try {
+      const { error } = await supabase.from("profiles").update({ [field]: value.trim() }).eq("user_id", user.id);
+      if (error) throw error;
+      toast.success("Profile updated!");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["streak-data"] });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save");
+    } finally {
+      setSavingPlatform(false);
+    }
+  };
 
   const Dropdown = ({ children, open }: { children: React.ReactNode; open: boolean }) => {
     if (!open) return null;
@@ -64,7 +87,6 @@ const Navbar = () => {
   const hasLeetcode = !!profile?.leetcode_url;
   const hasKaggle = !!profile?.kaggle_url;
 
-  // Generate 7 day streak dots from streak data
   const generateDots = (streak: number) => {
     const dots = [];
     for (let i = 6; i >= 0; i--) {
@@ -77,6 +99,34 @@ const Navbar = () => {
   const leetcodeDots = generateDots(streakData?.leetcode?.streak || 0);
   const kaggleDots = generateDots(streakData?.kaggle?.weekly_activity || 0);
 
+  // Messaging: fetch recent conversations
+  const [recentMessages, setRecentMessages] = useState<any[]>([]);
+  useEffect(() => {
+    if (!user || !msgOpen) return;
+    const fetchMessages = async () => {
+      const { data } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (data) {
+        // Group by conversation partner
+        const seen = new Set<string>();
+        const convos: any[] = [];
+        data.forEach(msg => {
+          const otherId = msg.sender_id === user.id ? msg.recipient_id : msg.sender_id;
+          if (!seen.has(otherId)) {
+            seen.add(otherId);
+            convos.push({ ...msg, partnerId: otherId });
+          }
+        });
+        setRecentMessages(convos.slice(0, 5));
+      }
+    };
+    fetchMessages();
+  }, [user, msgOpen]);
+
   return (
     <>
       <nav className="sticky top-0 z-50 bg-card border-b shadow-sm" ref={dropdownRef}>
@@ -85,13 +135,7 @@ const Navbar = () => {
             <Link to="/" className="text-primary font-bold text-xl tracking-tight">DevConnect</Link>
             <form className="relative hidden sm:block" onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search candidates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-sm w-56 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-              />
+              <input type="text" placeholder="Search candidates..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-4 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-sm w-56 focus:outline-none focus:ring-2 focus:ring-ring transition-all" />
             </form>
           </div>
 
@@ -100,17 +144,14 @@ const Navbar = () => {
               <Users className="h-5 w-5" />
               <span className="text-[10px] mt-0.5 hidden md:block">Network</span>
             </Link>
-
             <Link to="/jobs" className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <Briefcase className="h-5 w-5" />
               <span className="text-[10px] mt-0.5 hidden md:block">Jobs</span>
             </Link>
-
             <button onClick={() => { closeAll(); setMsgOpen(!msgOpen); }} className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <MessageSquare className="h-5 w-5" />
               <span className="text-[10px] mt-0.5 hidden md:block">Messaging</span>
             </button>
-
             <Link to="/notifications" className="relative flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <Bell className="h-5 w-5" />
               <span className="text-[10px] mt-0.5 hidden md:block">Notifications</span>
@@ -137,25 +178,36 @@ const Navbar = () => {
                       <StreakDots days={githubDots} />
                     </div>
                     <div className="px-3 py-1.5 flex justify-between text-xs">
-                      <span className="text-muted-foreground">Total Commits</span>
+                      <span className="text-muted-foreground">Weekly Commits</span>
                       <span className="font-medium text-foreground">{streakData?.github?.weekly_commits || 0}</span>
                     </div>
                     <div className="px-3 py-1.5 flex justify-between text-xs">
-                      <span className="text-muted-foreground">This Week</span>
-                      <span className="font-medium text-foreground">{streakData?.github?.weekly_commits || 0}</span>
+                      <span className="text-muted-foreground">Streak Days</span>
+                      <span className="font-medium text-foreground">{streakData?.github?.streak || 0}</span>
                     </div>
                     <hr className="border-border my-1" />
-                    <a href={profile?.github_url || "https://github.com"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
+                    <a href={profile?.github_url || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
                       <ExternalLink className="h-3.5 w-3.5" /> Open GitHub
                     </a>
                   </>
                 ) : (
-                  <>
-                    <div className="px-3 py-3 text-xs text-muted-foreground">No GitHub profile linked yet.</div>
-                    <Link to="/add-platform" onClick={() => setGithubOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
-                      <Plus className="h-3.5 w-3.5" /> Add GitHub
-                    </Link>
-                  </>
+                  <div className="px-3 py-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Enter your GitHub profile URL:</p>
+                    <input
+                      type="url"
+                      value={githubInput}
+                      onChange={(e) => setGithubInput(e.target.value)}
+                      placeholder="https://github.com/username"
+                      className="w-full px-2 py-1.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    <button
+                      onClick={() => { savePlatformUrl("github_url", githubInput); setGithubOpen(false); }}
+                      disabled={savingPlatform || !githubInput.trim()}
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 disabled:opacity-50"
+                    >
+                      <Check className="h-3.5 w-3.5" /> {savingPlatform ? "Saving..." : "Link GitHub"}
+                    </button>
+                  </div>
                 )}
               </Dropdown>
             </div>
@@ -176,25 +228,22 @@ const Navbar = () => {
                       <StreakDots days={leetcodeDots} />
                     </div>
                     <div className="px-3 py-1.5 flex justify-between text-xs">
-                      <span className="text-muted-foreground">Total Questions</span>
-                      <span className="font-medium text-foreground">{streakData?.leetcode?.weekly_solved || 0}</span>
-                    </div>
-                    <div className="px-3 py-1.5 flex justify-between text-xs">
-                      <span className="text-muted-foreground">This Week</span>
+                      <span className="text-muted-foreground">Weekly Solved</span>
                       <span className="font-medium text-foreground">{streakData?.leetcode?.weekly_solved || 0}</span>
                     </div>
                     <hr className="border-border my-1" />
-                    <a href={profile?.leetcode_url || "https://leetcode.com"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
+                    <a href={profile?.leetcode_url || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
                       <ExternalLink className="h-3.5 w-3.5" /> Open LeetCode
                     </a>
                   </>
                 ) : (
-                  <>
-                    <div className="px-3 py-3 text-xs text-muted-foreground">No LeetCode profile linked yet.</div>
-                    <Link to="/add-platform" onClick={() => setLeetcodeOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
-                      <Plus className="h-3.5 w-3.5" /> Add LeetCode
-                    </Link>
-                  </>
+                  <div className="px-3 py-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Enter your LeetCode profile URL:</p>
+                    <input type="url" value={leetcodeInput} onChange={(e) => setLeetcodeInput(e.target.value)} placeholder="https://leetcode.com/username" className="w-full px-2 py-1.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <button onClick={() => { savePlatformUrl("leetcode_url", leetcodeInput); setLeetcodeOpen(false); }} disabled={savingPlatform || !leetcodeInput.trim()} className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 disabled:opacity-50">
+                      <Check className="h-3.5 w-3.5" /> {savingPlatform ? "Saving..." : "Link LeetCode"}
+                    </button>
+                  </div>
                 )}
               </Dropdown>
             </div>
@@ -219,18 +268,38 @@ const Navbar = () => {
                       <span className="font-medium text-foreground">{streakData?.kaggle?.weekly_activity || 0}</span>
                     </div>
                     <hr className="border-border my-1" />
-                    <a href={profile?.kaggle_url || "https://kaggle.com"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
+                    <a href={profile?.kaggle_url || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
                       <ExternalLink className="h-3.5 w-3.5" /> Open Kaggle
                     </a>
                   </>
                 ) : (
-                  <>
-                    <div className="px-3 py-3 text-xs text-muted-foreground">No Kaggle profile linked yet.</div>
-                    <Link to="/add-platform" onClick={() => setKaggleOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary text-sm text-primary transition-colors">
-                      <Plus className="h-3.5 w-3.5" /> Add Kaggle
-                    </Link>
-                  </>
+                  <div className="px-3 py-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Enter your Kaggle profile URL:</p>
+                    <input type="url" value={kaggleInput} onChange={(e) => setKaggleInput(e.target.value)} placeholder="https://kaggle.com/username" className="w-full px-2 py-1.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <button onClick={() => { savePlatformUrl("kaggle_url", kaggleInput); setKaggleOpen(false); }} disabled={savingPlatform || !kaggleInput.trim()} className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 disabled:opacity-50">
+                      <Check className="h-3.5 w-3.5" /> {savingPlatform ? "Saving..." : "Link Kaggle"}
+                    </button>
+                  </div>
                 )}
+              </Dropdown>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="relative">
+              <button onClick={() => { closeAll(); setLinkedinOpen(!linkedinOpen); }} className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
+                <Linkedin className="h-5 w-5" />
+                <span className="text-[10px] mt-0.5 hidden md:block">LinkedIn</span>
+              </button>
+              <Dropdown open={linkedinOpen}>
+                <p className="px-3 py-2 text-sm font-semibold text-foreground">LinkedIn</p>
+                <hr className="border-border my-1" />
+                <div className="px-3 py-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">Enter your LinkedIn profile URL:</p>
+                  <input type="url" value={linkedinInput} onChange={(e) => setLinkedinInput(e.target.value)} placeholder="https://linkedin.com/in/username" className="w-full px-2 py-1.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <button onClick={() => { toast.success("LinkedIn URL saved (display coming soon)"); setLinkedinOpen(false); }} disabled={!linkedinInput.trim()} className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#0077B5] text-white rounded-md text-xs font-medium hover:bg-[#0077B5]/90 disabled:opacity-50">
+                    <Check className="h-3.5 w-3.5" /> Link LinkedIn
+                  </button>
+                </div>
               </Dropdown>
             </div>
 
@@ -279,24 +348,40 @@ const Navbar = () => {
       {msgOpen && (
         <div className="fixed inset-0 z-[100]" onClick={() => setMsgOpen(false)}>
           <div className="absolute inset-0 bg-black/30" />
-          <div
-            className="absolute right-0 top-0 h-full w-80 bg-card border-l shadow-xl p-0 animate-in slide-in-from-right duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="absolute right-0 top-0 h-full w-80 bg-card border-l shadow-xl p-0 animate-in slide-in-from-right duration-300" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <h2 className="text-sm font-semibold text-foreground">Messaging</h2>
-              <button aria-label="Close messaging panel" onClick={() => setMsgOpen(false)} className="p-1 rounded-md hover:bg-secondary text-muted-foreground"><X className="h-4 w-4" /></button>
+              <button aria-label="Close" onClick={() => setMsgOpen(false)} className="p-1 rounded-md hover:bg-secondary text-muted-foreground"><X className="h-4 w-4" /></button>
             </div>
-            <div className="p-4 space-y-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors cursor-pointer">
-                  <div className="w-9 h-9 rounded-full bg-secondary animate-pulse flex-shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 w-24 bg-secondary rounded animate-pulse" />
-                    <div className="h-2 w-40 bg-secondary rounded animate-pulse" />
-                  </div>
-                </div>
-              ))}
+            <div className="p-2 space-y-1">
+              {recentMessages.length === 0 ? (
+                <div className="p-6 text-center text-xs text-muted-foreground">No messages yet. Connect with people to start chatting!</div>
+              ) : (
+                recentMessages.map((msg) => (
+                  <Link
+                    key={msg.id}
+                    to="/network"
+                    onClick={() => setMsgOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">{msg.content}</p>
+                      <p className="text-[10px] text-muted-foreground">{new Date(msg.created_at).toLocaleString()}</p>
+                    </div>
+                    {!msg.is_read && msg.sender_id !== user?.id && (
+                      <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    )}
+                  </Link>
+                ))
+              )}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t">
+              <Link to="/network" onClick={() => setMsgOpen(false)} className="block w-full text-center py-2 text-sm text-primary hover:underline">
+                Open all messages
+              </Link>
             </div>
           </div>
         </div>
