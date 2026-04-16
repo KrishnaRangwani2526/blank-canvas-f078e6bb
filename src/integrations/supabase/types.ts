@@ -414,7 +414,10 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          progress: number | null
+          proof: string | null
           status: string | null
+          target_date: string | null
           title: string
           user_id: string
         }
@@ -422,7 +425,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          progress?: number | null
+          proof?: string | null
           status?: string | null
+          target_date?: string | null
           title: string
           user_id: string
         }
@@ -430,7 +436,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          progress?: number | null
+          proof?: string | null
           status?: string | null
+          target_date?: string | null
           title?: string
           user_id?: string
         }
@@ -572,21 +581,51 @@ export type Database = {
       }
       skills: {
         Row: {
+          category: string | null
           created_at: string
           id: string
           name: string
           user_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           id?: string
           name: string
           user_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           id?: string
           name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      timeline_tasks: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
