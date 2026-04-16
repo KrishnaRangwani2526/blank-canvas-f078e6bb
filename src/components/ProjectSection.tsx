@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import EditModal, { FormField, FormInput, FormTextarea, SaveButton, DeleteButton } from "./EditModal";
 import { useSkillExtractor } from "@/hooks/useSkillExtractor";
 import type { Tables } from "@/integrations/supabase/types";
+import { formatTechStackForStorage, joinTechStack, normalizeTechStack, saveExtractedSkills } from "@/lib/profile-data";
+import { toast } from "sonner";
 
 interface Props {
   projects: Tables<"projects">[];
@@ -13,7 +15,7 @@ interface Props {
 
 const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, refetch }, ref) => {
   const { user } = useAuth();
-  const { extractSkills, isLoading: extractingSkills } = useSkillExtractor();
+  const { extractSkills } = useSkillExtractor();
   useImperativeHandle(ref, () => ({ openAdd: () => { resetForm(); setAdding(true); } }));
   const [editing, setEditing] = useState<Tables<"projects"> | null>(null);
   const [adding, setAdding] = useState(false);
@@ -31,7 +33,7 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
   const openAdd = () => { resetForm(); setAdding(true); };
   const openEdit = (p: Tables<"projects">) => {
     setTitle(p.title || ""); setDescription(p.description || ""); setLink(p.project_link || "");
-    setTechStack(p.tech_stack || ""); setStartDate(p.start_date || ""); setEndDate(p.end_date || "");
+    setTechStack(normalizeTechStack(p.tech_stack).join(", ")); setStartDate(p.start_date || ""); setEndDate(p.end_date || "");
     setEditing(p);
   };
 
@@ -41,15 +43,19 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
     setSaving(true);
     const data = {
       title, description, project_link: link,
-      tech_stack: techStack,
+      tech_stack: formatTechStackForStorage(techStack),
+      start_date: startDate || null,
+      end_date: endDate || null,
       user_id: user.id,
     };
 
     if (editing) {
-      await supabase.from("projects").update(data).eq("id", editing.id);
+      const { error } = await supabase.from("projects").update(data).eq("id", editing.id);
+      if (error) throw error;
       setEditing(null);
     } else {
-      await supabase.from("projects").insert(data);
+      const { error } = await supabase.from("projects").insert(data);
+      if (error) throw error;
       setAdding(false);
     }
     setSaving(false);
@@ -58,7 +64,8 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
 
   const del = async (id: string) => {
     setSaving(true);
-    await supabase.from("projects").delete().eq("id", id);
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (error) throw error;
     setSaving(false);
     setEditing(null);
     refetch();
@@ -67,30 +74,24 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
   const handleExtractSkills = async (project: Tables<"projects">) => {
     setExtractingProj(project.id);
     try {
-      const ts = Array.isArray(project.tech_stack) ? (project.tech_stack as string[]).join(" ") : "";
-      const content = `${project.title} ${project.description || ""} ${ts}`.trim();
+      const content = `${project.title} ${project.description || ""} ${joinTechStack(project.tech_stack)}`.trim();
       if (!content) {
         throw new Error("Project has no content to analyze");
       }
 
       const result = await extractSkills(content);
 
-      // Add extracted skills to user's skills
       if (result.skills.length > 0 && user) {
-        const skillsToAdd = result.skills.map(skill => ({
-          user_id: user.id,
-          name: skill.name,
-        }));
-
-        await supabase.from("skills").upsert(skillsToAdd, {
-          onConflict: "user_id,name",
-          ignoreDuplicates: false
-        });
+        const insertedCount = await saveExtractedSkills(user.id, result.skills);
 
         refetch();
+        toast.success(insertedCount > 0 ? `Added ${insertedCount} skills from project` : "Skills were extracted, but all were already in your profile");
+      } else {
+        toast.error("No skills were detected from this project");
       }
     } catch (error) {
       console.error("Skill extraction failed:", error);
+      toast.error(error instanceof Error ? error.message : "Skill extraction failed");
     } finally {
       setExtractingProj(null);
     }
@@ -156,9 +157,9 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
                     </div>
                   </div>
                   {project.description && <p className="text-xs text-muted-foreground mt-0.5">{project.description}</p>}
-                  {Array.isArray(project.tech_stack) && (project.tech_stack as string[]).length > 0 && (
+                   {normalizeTechStack(project.tech_stack).length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {(project.tech_stack as string[]).map((t: string) => (
+                       {normalizeTechStack(project.tech_stack).map((t: string) => (
                         <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">{t as string}</span>
                       ))}
                     </div>
