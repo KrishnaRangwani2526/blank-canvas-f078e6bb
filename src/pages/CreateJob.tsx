@@ -21,7 +21,7 @@ interface Skill {
 
 export default function CreateJob() {
   const navigate = useNavigate();
-  const { company } = useAuth();
+  const { company, user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState("");
@@ -48,15 +48,29 @@ export default function CreateJob() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!company) {
-      toast.error("Company profile is missing. Please sign out and sign back in, or recreate your account.");
+    let activeCompany = company;
+    if (!activeCompany && user) {
+      const { data: existing } = await supabase.from("companies").select("*").eq("user_id", user.id).maybeSingle();
+      if (existing) {
+        activeCompany = existing;
+      } else {
+        const companyName = user.user_metadata?.company_name || "My Company";
+        const { data: created, error: createErr } = await supabase.from("companies").insert({
+          user_id: user.id, name: companyName, email: user.email || "",
+        }).select("*").single();
+        if (createErr) { toast.error("Could not create company profile: " + createErr.message); return; }
+        activeCompany = created;
+      }
+    }
+    if (!activeCompany) {
+      toast.error("Company profile is missing. Please sign out and sign back in.");
       return;
     }
     setLoading(true);
 
     try {
       const { data: jobData, error } = await supabase.from("jobs").insert({
-        company_id: company.id,
+        company_id: activeCompany.id,
         title,
         description,
         location,
@@ -78,7 +92,7 @@ export default function CreateJob() {
       if (candidates?.length) {
         await supabase.from("notifications").insert(
           candidates.map((candidate) => ({
-            company_id: company.id,
+            company_id: activeCompany.id,
             message: `New job posted: ${title}`,
             is_read: false,
             metadata: {
