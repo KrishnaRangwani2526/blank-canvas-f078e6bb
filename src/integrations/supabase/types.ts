@@ -602,6 +602,7 @@ export type Database = {
           about: string | null
           avatar_url: string | null
           bio: string | null
+          cover_image_url: string | null
           created_at: string
           currently_learning: string | null
           full_name: string | null
@@ -620,6 +621,7 @@ export type Database = {
           about?: string | null
           avatar_url?: string | null
           bio?: string | null
+          cover_image_url?: string | null
           created_at?: string
           currently_learning?: string | null
           full_name?: string | null
@@ -638,6 +640,7 @@ export type Database = {
           about?: string | null
           avatar_url?: string | null
           bio?: string | null
+          cover_image_url?: string | null
           created_at?: string
           currently_learning?: string | null
           full_name?: string | null
