@@ -17,6 +17,11 @@ export interface ResumeData {
     duration: string;
     description: string;
   }>;
+  certificates: Array<{
+    title: string;
+    issuer: string;
+    date?: string;
+  }>;
   education: Array<{
     school: string;
     degree: string;
