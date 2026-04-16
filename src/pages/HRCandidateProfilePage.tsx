@@ -412,6 +412,7 @@ o
     email: profile.email || "",
     bio: profile.bio,
     profile_pic: profile.avatar_url,
+    cover_image: profile.cover_image_url,
     about: profile.about,
     skills: skills.map((s) => s.name),
     education: education.map((e) => ({
