@@ -1,7 +1,7 @@
 import type { ATSResult } from "@/hooks/useAtsAnalyzer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, TrendingUp, AlertCircle, CheckCircle2, Github, Code2, Flame } from "lucide-react";
 
 interface ATSResultModalProps {
   result: ATSResult | null;
@@ -86,6 +86,52 @@ export function ATSResultModal({ result, loading, title = "ATS Analysis" }: ATSR
           )}
         </CardContent>
       </Card>
+
+      {/* Streak Analysis */}
+      {result.streak_analysis && (
+        <Card className="bg-gradient-to-br from-orange-500/10 to-primary/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Flame className="h-3.5 w-3.5 text-orange-500" /> Consistency & Streaks
+              <Badge variant="outline" className="ml-auto text-[10px] capitalize">
+                {result.streak_analysis.consistency_rating}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="text-center p-2 rounded-lg bg-card border border-border">
+                <Github className="h-4 w-4 mx-auto mb-1 text-foreground" />
+                <p className="text-lg font-bold text-primary">{result.streak_analysis.github_streak}</p>
+                <p className="text-[10px] text-muted-foreground">GitHub</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-card border border-border">
+                <Code2 className="h-4 w-4 mx-auto mb-1 text-foreground" />
+                <p className="text-lg font-bold text-primary">{result.streak_analysis.leetcode_streak}</p>
+                <p className="text-[10px] text-muted-foreground">LeetCode</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-card border border-border">
+                <Flame className="h-4 w-4 mx-auto mb-1 text-orange-500" />
+                <p className="text-lg font-bold text-primary">{result.streak_analysis.aspiring_streak}</p>
+                <p className="text-[10px] text-muted-foreground">Aspiring</p>
+              </div>
+            </div>
+            <p className="text-xs text-foreground leading-relaxed">{result.streak_analysis.insight}</p>
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-muted-foreground">Overall Consistency</span>
+                <span className="font-semibold text-primary">{result.consistency_score}/100</span>
+              </div>
+              <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-orange-500 to-primary h-1.5 rounded-full transition-all"
+                  style={{ width: `${result.consistency_score}%` }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Strengths Summary */}
       <Card>
