@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          ats_score: number | null
+          candidate_id: string | null
+          cover_letter: string | null
+          created_at: string
+          id: string
+          job_id: string
+          rank: number | null
+          resume_url: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ats_score?: number | null
+          candidate_id?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          rank?: number | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ats_score?: number | null
+          candidate_id?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          rank?: number | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidates: {
         Row: {
           about: string | null
