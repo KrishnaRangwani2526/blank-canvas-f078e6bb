@@ -30,6 +30,7 @@ export function useCompanyResumeGeneration() {
         bio: candidateData.about || "Professional developer",
         skills: [],
         experience: [],
+        certificates: [],
         education: [],
         projects: [],
       };

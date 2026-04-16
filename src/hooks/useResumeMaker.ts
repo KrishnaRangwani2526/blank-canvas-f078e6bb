@@ -17,6 +17,11 @@ export interface ResumeData {
     duration: string;
     description: string;
   }>;
+  certificates: Array<{
+    title: string;
+    issuer: string;
+    date?: string;
+  }>;
   education: Array<{
     school: string;
     degree: string;
@@ -33,7 +38,7 @@ export interface ResumeData {
 
 export function useResumeMaker() {
   const { user } = useAuth();
-  const { profile, skills, experience, projects, education } = useProfile(user?.id);
+  const { profile, skills, experience, projects, education, certificates } = useProfile(user?.id);
   const [loading, setLoading] = useState(false);
   const [resume, setResume] = useState<ResumeData | null>(null);
 
@@ -57,6 +62,11 @@ export function useResumeMaker() {
           role: e.role,
           duration: `${e.start_date || "2020"} - ${e.end_date || "Present"}`,
           description: e.description || "",
+        })),
+        certificates: certificates.map((c: any) => ({
+          title: c.title,
+          issuer: c.issuer || "",
+          date: c.issue_date || "",
         })),
         education: education.map((e) => ({
           school: e.school,
@@ -90,6 +100,11 @@ Provide a detailed JSON response exactly matching this schema to populate the UI
     "role": "string",
     "duration": "string",
     "description": "string (bullet points separated by \\n\\n or a highly polished paragraph)"
+  }],
+  "certificates": [{
+    "title": "string",
+    "issuer": "string",
+    "date": "string"
   }],
   "education": [{
     "school": "string",

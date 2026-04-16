@@ -87,6 +87,21 @@ export function ResumePreviewModal({ resume, loading }: ResumePreviewModalProps)
           </div>
         )}
 
+        {/* Certificates */}
+        {resume.certificates && resume.certificates.length > 0 && (
+          <div>
+            <p className="font-bold text-foreground uppercase text-[10px] mb-1">Certificates</p>
+            <div className="space-y-0.5">
+              {resume.certificates.map((cert, i) => (
+                <div key={i} className="border-l border-primary/30 pl-2">
+                  <p className="font-semibold text-foreground text-[10px]">{cert.title}</p>
+                  <p className="text-muted-foreground text-[9px]">{cert.issuer}{cert.date ? ` • ${cert.date}` : ""}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Education */}
         {resume.education.length > 0 && (
           <div>
