@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { prompt, mode, system } = await req.json();
+    const { prompt, mode, system, model } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "prompt is required" }), {
@@ -36,9 +36,9 @@ Deno.serve(async (req) => {
     ];
 
     const body: Record<string, unknown> = {
-      model: "google/gemini-3-flash-preview",
+      model: model || "google/gemini-2.5-pro",
       messages,
-      temperature: isJson ? 0.2 : 0.7,
+      temperature: isJson ? 0.3 : 0.8,
     };
 
     if (isJson) {
