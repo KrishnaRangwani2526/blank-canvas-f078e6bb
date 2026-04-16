@@ -78,7 +78,14 @@ export default function JobCandidatesPage() {
         return;
       }
 
-      const userIds = applications.map((a) => a.candidate_id);
+      // candidate_id may be null; fall back to user_id (the applicant)
+      const userIds = applications.map((a) => a.candidate_id || a.user_id).filter(Boolean);
+
+      if (userIds.length === 0) {
+        setCandidates([]);
+        setRankLoading(false);
+        return;
+      }
 
       // Fetch profiles and skills for applicants
       const [profilesRes, skillsRes] = await Promise.all([
