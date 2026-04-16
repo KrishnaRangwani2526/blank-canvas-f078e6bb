@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigate, Link } from "react-router-dom";
 import { Diamond, ChevronDown, ChevronUp, TrendingUp, Award, FolderGit2, GitBranch, Brain, PieChart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { isGitHubRepoLink, normalizeTechStack } from "@/lib/profile-data";
 
 const SkillsPage = () => {
   const { user, loading: authLoading } = useAuth();
@@ -65,11 +66,12 @@ const SkillsPage = () => {
       }
     });
     projects.forEach(p => {
-      const inTech = (p.tech_stack || []).some((t: string) => t.toLowerCase() === lower);
+      const inTech = normalizeTechStack(p.tech_stack).some((t: string) => t.toLowerCase() === lower);
       const inTitle = p.title?.toLowerCase().includes(lower);
       const inDesc = p.description?.toLowerCase().includes(lower);
+      const isRepo = isGitHubRepoLink(p.project_link);
       if (inTech || inTitle || inDesc) {
-        sources.push({ type: p.github_link ? "git" : "project", icon: p.github_link ? GitBranch : FolderGit2, label: `${p.github_link ? "Repo" : "Project"}: ${p.title}` });
+        sources.push({ type: isRepo ? "git" : "project", icon: isRepo ? GitBranch : FolderGit2, label: `${isRepo ? "Repo" : "Project"}: ${p.title}` });
       }
     });
     if (sources.length === 0) sources.push({ type: "ai", icon: Brain, label: "Extracted via AI" });

@@ -4,6 +4,7 @@ import { Plus, Award, Pencil, Brain, ExternalLink, Upload } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillExtractor } from "@/hooks/useSkillExtractor";
+import { saveExtractedSkills } from "@/lib/profile-data";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
@@ -63,10 +64,12 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
 
     const data = { title, issuer, issue_date: issueDate || null, description: description || null, credential_url: finalUrl || null, user_id: user.id };
     if (editing) {
-      await supabase.from("certificates").update(data).eq("id", editing.id);
+      const { error } = await supabase.from("certificates").update(data).eq("id", editing.id);
+      if (error) throw error;
       setEditing(null);
     } else {
-      const { data: newCert } = await supabase.from("certificates").insert(data).select().single();
+      const { data: newCert, error } = await supabase.from("certificates").insert(data).select().single();
+      if (error) throw error;
       if (newCert) setJustAdded(newCert.id);
       setAdding(false);
     }
@@ -76,7 +79,8 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
 
   const del = async (id: string) => {
     setSaving(true);
-    await supabase.from("certificates").delete().eq("id", id);
+    const { error } = await supabase.from("certificates").delete().eq("id", id);
+    if (error) throw error;
     setSaving(false);
     setEditing(null);
     refetch();
@@ -85,14 +89,15 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
   const handleExtractSkills = async (cert: Tables<"certificates">) => {
     setExtractingCert(cert.id);
     try {
-      const content = `${cert.name} ${cert.issuer || ""}`.trim();
+      const content = `${cert.title || ""} ${cert.issuer || ""} ${cert.description || ""}`.trim();
       if (!content) throw new Error("Certificate has no content to analyze");
       const result = await extractSkills(content);
       if (result?.skills?.length && user) {
-        const skillsToAdd = result.skills.map(skill => ({ user_id: user.id, name: skill.name, category: skill.category || null }));
-        await supabase.from("skills").upsert(skillsToAdd, { onConflict: "user_id,name", ignoreDuplicates: false });
+        const insertedCount = await saveExtractedSkills(user.id, result.skills);
         refetch();
-        toast.success(`Added ${result.skills.length} skills from certificate`);
+        toast.success(insertedCount > 0 ? `Added ${insertedCount} skills from certificate` : "Skills were extracted, but all were already in your profile");
+      } else {
+        toast.error("No skills were detected from this certificate");
       }
       setJustAdded(null);
     } catch (error) {
@@ -147,7 +152,7 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-card-foreground">{cert.name}</p>
+                    <p className="text-sm font-semibold text-card-foreground">{cert.title}</p>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       {user?.id === cert.user_id && (
                         <button onClick={() => openEdit(cert)} className="p-1 rounded-md hover:bg-secondary transition-all">

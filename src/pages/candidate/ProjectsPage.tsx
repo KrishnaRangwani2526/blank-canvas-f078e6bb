@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import LeftSidebar from "@/components/LeftSidebar";
 import { useProfile } from "@/hooks/useProfile";
@@ -14,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillExtractor } from "@/hooks/useSkillExtractor";
+import { formatTechStackForStorage, isGitHubRepoLink, joinTechStack, normalizeTechStack, saveExtractedSkills } from "@/lib/profile-data";
 import { toast } from "sonner";
 
 const ProjectsPage = () => {
@@ -42,8 +42,8 @@ const ProjectsPage = () => {
         user_id: user.id,
         title: repoForm.title,
         description: repoForm.description,
-        tech_stack: repoForm.tech_stack.split(",").map(s => s.trim()).filter(Boolean),
-        github_link: repoForm.github_link,
+        tech_stack: formatTechStackForStorage(repoForm.tech_stack),
+        project_link: repoForm.github_link,
         start_date: repoForm.start_date || null,
       }).select().single();
       if (error) throw error;
@@ -64,8 +64,8 @@ const ProjectsPage = () => {
         user_id: user.id,
         title: projectForm.title,
         description: projectForm.description,
-        tech_stack: projectForm.tech_stack.split(",").map(s => s.trim()).filter(Boolean),
-        project_link: projectForm.project_link,
+        tech_stack: formatTechStackForStorage(projectForm.tech_stack),
+        project_link: projectForm.project_link || null,
         start_date: projectForm.start_date || null,
       }).select().single();
       if (error) throw error;
@@ -81,24 +81,26 @@ const ProjectsPage = () => {
   const handleExtractSkills = async (project: any) => {
     setExtractingProj(project.id);
     try {
-      const content = `${project.title} ${project.description || ""} ${project.tech_stack?.join(" ") || ""}`.trim();
+      const content = `${project.title} ${project.description || ""} ${joinTechStack(project.tech_stack)}`.trim();
       if (!content) throw new Error("No content to analyze");
       const result = await extractSkills(content);
       if (result?.skills?.length && user) {
-        const skillsToAdd = result.skills.map(s => ({ user_id: user.id, name: s.name }));
-        await supabase.from("skills").upsert(skillsToAdd, { onConflict: "user_id,name", ignoreDuplicates: false });
+        const insertedCount = await saveExtractedSkills(user.id, result.skills);
         refetch();
-        toast.success(`Added ${result.skills.length} skills from project`);
+        toast.success(insertedCount > 0 ? `Added ${insertedCount} skills from project` : "Skills were extracted, but all were already in your profile");
+      } else {
+        toast.error("No skills were detected from this project");
       }
       setJustAdded(null);
-    } catch { toast.error("Failed to extract skills"); }
+    } catch (error: any) { toast.error(error.message || "Failed to extract skills"); }
     finally { setExtractingProj(null); }
   };
 
   const handleDeleteProject = async (projectId: string) => {
     setDeletingProj(projectId);
     try {
-      await supabase.from("projects").delete().eq("id", projectId);
+      const { error } = await supabase.from("projects").delete().eq("id", projectId);
+      if (error) throw error;
       refetch();
       toast.success("Project deleted");
     } catch { toast.error("Failed to delete"); }
@@ -183,9 +185,14 @@ const ProjectsPage = () => {
                 {projects.map((project) => (
                   <Card key={project.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-5">
+                      {(() => {
+                        const techStack = normalizeTechStack(project.tech_stack);
+                        const isRepo = isGitHubRepoLink(project.project_link);
+
+                        return (
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          {project.github_link ? <GitBranch className="h-4 w-4 text-muted-foreground" /> : <FolderGit2 className="h-4 w-4 text-muted-foreground" />}
+                          {isRepo ? <GitBranch className="h-4 w-4 text-muted-foreground" /> : <FolderGit2 className="h-4 w-4 text-muted-foreground" />}
                           <h3 className="text-base font-semibold text-foreground">{project.title}</h3>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => handleDeleteProject(project.id)} disabled={deletingProj === project.id} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
@@ -197,9 +204,9 @@ const ProjectsPage = () => {
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
                       )}
 
-                      {project.tech_stack && (
+                      {techStack.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
-                          {(Array.isArray(project.tech_stack) ? project.tech_stack : project.tech_stack.split(",").map(s => s.trim()).filter(Boolean)).map((tech: string) => (
+                          {techStack.map((tech: string) => (
                             <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
                           ))}
                         </div>
@@ -210,14 +217,14 @@ const ProjectsPage = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {(project.github_link || project.project_link) && (
+                        {project.project_link && (
                           <a
-                            href={project.github_link || project.project_link || "#"}
+                            href={project.project_link}
                             target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                           >
                             <ExternalLink className="h-3 w-3" />
-                            {project.github_link ? "Show Repo" : "Show Project"}
+                            {isRepo ? "Show Repo" : "Show Project"}
                           </a>
                         )}
                         {/* Show "Add Skill" button if just added or always */}
@@ -231,6 +238,8 @@ const ProjectsPage = () => {
                           {extractingProj === project.id ? "Extracting..." : "Add Skill"}
                         </Button>
                       </div>
+                        );
+                      })()}
                     </CardContent>
                   </Card>
                 ))}
