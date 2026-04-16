@@ -438,6 +438,9 @@ export default function NetworkPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }
