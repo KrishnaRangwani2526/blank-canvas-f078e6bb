@@ -33,8 +33,8 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
   const resetForm = () => { setTitle(""); setIssuer(""); setIssueDate(""); setDescription(""); setCredentialUrl(""); setFile(null); };
   const openAdd = () => { resetForm(); setAdding(true); };
   const openEdit = (c: Tables<"certificates">) => {
-    setTitle(c.name); setIssuer(c.issuer || ""); setIssueDate(c.issue_date || "");
-    setCredentialUrl(c.credential_url || ""); setDescription(""); setEditing(c); setFile(null);
+    setTitle(c.title); setIssuer(c.issuer || ""); setIssueDate(c.issue_date || "");
+    setCredentialUrl(c.credential_url || ""); setDescription(c.description || ""); setEditing(c); setFile(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +61,7 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
       }
     }
 
-    const data = { name: title, issuer, issue_date: issueDate || null, credential_url: finalUrl || null, user_id: user.id };
+    const data = { title, issuer, issue_date: issueDate || null, description: description || null, credential_url: finalUrl || null, user_id: user.id };
     if (editing) {
       await supabase.from("certificates").update(data).eq("id", editing.id);
       setEditing(null);

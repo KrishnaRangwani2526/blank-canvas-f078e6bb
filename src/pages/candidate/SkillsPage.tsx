@@ -60,8 +60,8 @@ const SkillsPage = () => {
     const sources: { type: string; icon: any; label: string }[] = [];
     const lower = skillName.toLowerCase();
     certificates.forEach(c => {
-      if (c.name?.toLowerCase().includes(lower) || c.issuer?.toLowerCase().includes(lower)) {
-        sources.push({ type: "certificate", icon: Award, label: `Certificate: ${c.name}` });
+      if (c.title?.toLowerCase().includes(lower) || c.issuer?.toLowerCase().includes(lower)) {
+        sources.push({ type: "certificate", icon: Award, label: `Certificate: ${c.title}` });
       }
     });
     projects.forEach(p => {
