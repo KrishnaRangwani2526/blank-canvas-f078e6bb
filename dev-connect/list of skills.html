@@ -1,0 +1,238 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.container{padding:1rem 0}
+.search-bar{width:100%;padding:10px 14px;font-size:14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);color:var(--color-text-primary);margin-bottom:1rem}
+.search-bar:focus{outline:none;border-color:var(--color-border-primary)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem}
+.tab{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all 0.15s}
+.tab.active,.tab:hover{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary)}
+.tab.active{font-weight:500}
+.domains{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.domain-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.domain-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.domain-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.domain-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.domain-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.skills-list{display:flex;flex-wrap:wrap;gap:6px}
+.skill-tag{font-size:12px;padding:3px 10px;border-radius:20px;cursor:default}
+.count{font-size:11px;color:var(--color-text-tertiary);margin-top:10px}
+.no-results{text-align:center;padding:3rem;color:var(--color-text-secondary);font-size:14px}
+</style>
+
+<div class="container">
+  <h2 class="sr-only">Developer Skills Map — Interactive explorer for all software engineering domains</h2>
+  <input class="search-bar" type="text" placeholder="Search skills (e.g. Python, Docker, NLP...)" id="search" />
+  <div class="tabs" id="tabs"></div>
+  <div class="domains" id="domains"></div>
+</div>
+
+<script>
+const data = [
+  {
+    id:"lang", role:"all", label:"Programming Languages",
+    sub:"Core languages every engineer needs",
+    color:"#E6F1FB", border:"#185FA5", text:"#0C447C", tagBg:"#E6F1FB", tagText:"#0C447C",
+    icon:"{ }", iconBg:"#185FA5", iconColor:"#fff",
+    skills:["Python","JavaScript","TypeScript","Java","C","C++","C#","Go","Rust","Kotlin","Swift","Scala","Ruby","PHP","R","Dart","Elixir","Haskell","Lua","Julia","Perl","MATLAB","Groovy","Shell/Bash","PowerShell","SQL","PL/SQL","T-SQL"]
+  },
+  {
+    id:"web", role:"dev", label:"Frontend Development",
+    sub:"Web UI, frameworks & browser tech",
+    color:"#EEEDFE", border:"#534AB7", text:"#3C3489", tagBg:"#EEEDFE", tagText:"#3C3489",
+    icon:"</>", iconBg:"#534AB7", iconColor:"#fff",
+    skills:["HTML5","CSS3","React","Next.js","Vue.js","Nuxt","Angular","Svelte","SolidJS","Astro","HTMX","Tailwind CSS","Bootstrap","Sass/SCSS","Webpack","Vite","Rollup","Redux","Zustand","React Query","GraphQL (client)","REST APIs","WebSockets","PWA","Web Components","Accessibility (WCAG)","SEO","Figma (dev handoff)","Storybook","Testing Library","Cypress","Playwright"]
+  },
+  {
+    id:"backend", role:"dev", label:"Backend Development",
+    sub:"APIs, servers & business logic",
+    color:"#E1F5EE", border:"#0F6E56", text:"#085041", tagBg:"#E1F5EE", tagText:"#085041",
+    icon:"⚙", iconBg:"#0F6E56", iconColor:"#fff",
+    skills:["Node.js","Express","Fastify","NestJS","Django","FastAPI","Flask","Spring Boot","ASP.NET Core","Laravel","Rails","Phoenix","Gin","Fiber","REST API design","GraphQL (server)","gRPC","WebSockets","OAuth2 / JWT","Rate limiting","Caching (Redis)","Message queues","Microservices","Event-driven arch","API versioning","OpenAPI / Swagger"]
+  },
+  {
+    id:"db", role:"dev", label:"Databases",
+    sub:"Relational, NoSQL, vector & more",
+    color:"#FAEEDA", border:"#854F0B", text:"#633806", tagBg:"#FAEEDA", tagText:"#633806",
+    icon:"DB", iconBg:"#854F0B", iconColor:"#fff",
+    skills:["PostgreSQL","MySQL","SQLite","Microsoft SQL Server","Oracle DB","Redis","MongoDB","Cassandra","DynamoDB","Firestore","Couchbase","InfluxDB","TimescaleDB","Neo4j","Elasticsearch","OpenSearch","Pinecone","Weaviate","Qdrant","pgvector","Milvus","Data modeling","Indexing & query opt","ACID / CAP theorem","Partitioning & sharding","Replication","Migrations","ORM (SQLAlchemy, Prisma)"]
+  },
+  {
+    id:"cloud", role:"dev", label:"Cloud & Infrastructure",
+    sub:"AWS, GCP, Azure & cloud-native",
+    color:"#FAECE7", border:"#993C1D", text:"#712B13", tagBg:"#FAECE7", tagText:"#712B13",
+    icon:"☁", iconBg:"#993C1D", iconColor:"#fff",
+    skills:["AWS (EC2, S3, Lambda, RDS, ECS, EKS, SQS, SNS, CloudFront)","Google Cloud (GKE, Cloud Run, BigQuery, Vertex AI)","Azure (AKS, Azure Functions, Cosmos DB)","Terraform","Pulumi","CloudFormation","CDK","Ansible","Serverless Framework","IAM & security policies","VPC & networking","Load balancers","CDN","Auto-scaling","Cost optimization","FinOps","Multi-cloud strategy"]
+  },
+  {
+    id:"devops", role:"devops", label:"DevOps & CI/CD",
+    sub:"Automation, pipelines & reliability",
+    color:"#FBEAF0", border:"#993556", text:"#72243E", tagBg:"#FBEAF0", tagText:"#72243E",
+    icon:"∞", iconBg:"#993556", iconColor:"#fff",
+    skills:["Docker","Kubernetes","Helm","Istio","GitHub Actions","GitLab CI","Jenkins","CircleCI","ArgoCD","FluxCD","Spinnaker","Tekton","Prometheus","Grafana","Alertmanager","ELK Stack","Loki","Jaeger","OpenTelemetry","Git","GitOps","Blue/Green deployments","Canary releases","Feature flags","SRE principles","SLI/SLO/SLA","Chaos engineering","Incident management"]
+  },
+  {
+    id:"security", role:"devops", label:"Security & DevSecOps",
+    sub:"AppSec, cloud security & compliance",
+    color:"#FCEBEB", border:"#A32D2D", text:"#791F1F", tagBg:"#FCEBEB", tagText:"#791F1F",
+    icon:"🔒", iconBg:"#A32D2D", iconColor:"#fff",
+    skills:["OWASP Top 10","Penetration testing","SAST / DAST","Snyk / Trivy","Vault (secrets management)","SSL/TLS","Encryption (AES, RSA)","Zero trust","SIEM","Identity & access (IAM)","RBAC / ABAC","Container security","Network security","SOC 2 / ISO 27001","GDPR compliance","HIPAA","CVE management","Bug bounty","Threat modeling","Security code review"]
+  },
+  {
+    id:"aiml", role:"ai", label:"AI / Machine Learning",
+    sub:"Core ML algorithms & theory",
+    color:"#EEEDFE", border:"#534AB7", text:"#3C3489", tagBg:"#EEEDFE", tagText:"#3C3489",
+    icon:"🧠", iconBg:"#534AB7", iconColor:"#fff",
+    skills:["Supervised learning","Unsupervised learning","Reinforcement learning","Linear / logistic regression","Decision trees","Random forests","Gradient boosting (XGBoost, LightGBM)","SVM","KNN","K-Means / DBSCAN","PCA / t-SNE / UMAP","Anomaly detection","Recommendation systems","Time series forecasting","Survival analysis","Bayesian inference","A/B testing","Causal inference","Feature engineering","Model evaluation & selection","Cross-validation","Hyperparameter tuning","Explainability (SHAP, LIME)"]
+  },
+  {
+    id:"dl", role:"ai", label:"Deep Learning & Neural Networks",
+    sub:"DL architectures & training",
+    color:"#E1F5EE", border:"#0F6E56", text:"#085041", tagBg:"#E1F5EE", tagText:"#085041",
+    icon:"⬡", iconBg:"#0F6E56", iconColor:"#fff",
+    skills:["PyTorch","TensorFlow","Keras","JAX","CNNs","RNNs / LSTMs","Transformers","Attention mechanisms","Diffusion models","GANs","VAEs","Graph Neural Networks","Transfer learning","Fine-tuning","LoRA / QLoRA","Quantization","ONNX","TensorRT","Mixed precision training","Distributed training (DDP, DeepSpeed)","Batch normalization","Dropout & regularization","Loss functions","Optimizers (Adam, AdaFactor)"]
+  },
+  {
+    id:"llm", role:"ai", label:"LLMs & Generative AI",
+    sub:"Foundation models, RAG & agents",
+    color:"#E6F1FB", border:"#185FA5", text:"#0C447C", tagBg:"#E6F1FB", tagText:"#0C447C",
+    icon:"✦", iconBg:"#185FA5", iconColor:"#fff",
+    skills:["Prompt engineering","RAG (Retrieval-Augmented Generation)","Embeddings","Vector databases","LangChain","LlamaIndex","Semantic Kernel","Agent frameworks (AutoGen, CrewAI)","OpenAI API","Anthropic API","Hugging Face Transformers","Ollama","RLHF / RLAIF","Constitutional AI","Multi-modal models","Function calling / tool use","Evaluation (RAGAS, LLM-as-judge)","Model deployment (vLLM, TGI)","Context window management","System prompt design","LLMOps","Model cards & responsible AI"]
+  },
+  {
+    id:"mlops", role:"ai", label:"MLOps & AI Engineering",
+    sub:"Model lifecycle, serving & monitoring",
+    color:"#FAEEDA", border:"#854F0B", text:"#633806", tagBg:"#FAEEDA", tagText:"#633806",
+    icon:"⚗", iconBg:"#854F0B", iconColor:"#fff",
+    skills:["MLflow","Weights & Biases","DVC","Kubeflow","Vertex AI Pipelines","SageMaker","ZenML","Feast (feature store)","BentoML","Seldon","Triton Inference Server","Model versioning","Experiment tracking","Data lineage","Monitoring (data drift, concept drift)","Shadow deployments","Champion/challenger","CI/CD for ML","Label Studio","Data labeling pipelines","Batch vs real-time inference","GPU cluster management","Cost-efficient training","Model compression"]
+  },
+  {
+    id:"nlp", role:"ai", label:"NLP & Computer Vision",
+    sub:"Text, image, audio & multimodal",
+    color:"#EAF3DE", border:"#3B6D11", text:"#27500A", tagBg:"#EAF3DE", tagText:"#27500A",
+    icon:"👁", iconBg:"#3B6D11", iconColor:"#fff",
+    skills:["Tokenization","Named entity recognition","Sentiment analysis","Text classification","Summarization","Machine translation","Question answering","Information extraction","spaCy","NLTK","Gensim","OpenCV","PIL/Pillow","Detectron2","YOLO","SAM (Segment Anything)","CLIP","Stable Diffusion","Whisper (ASR)","TTS (ElevenLabs, Coqui)","Object detection","Image segmentation","OCR","Multimodal (LLaVA, GPT-4V)"]
+  },
+  {
+    id:"data", role:"data", label:"Data Engineering",
+    sub:"Pipelines, warehouses & streaming",
+    color:"#FAECE7", border:"#993C1D", text:"#712B13", tagBg:"#FAECE7", tagText:"#712B13",
+    icon:"⇌", iconBg:"#993C1D", iconColor:"#fff",
+    skills:["Apache Spark","Apache Kafka","Apache Flink","Airflow","Prefect","Dagster","dbt","Snowflake","BigQuery","Redshift","Databricks","Delta Lake","Apache Iceberg","Hudi","ETL / ELT patterns","Data lakes","Data lakehouses","Medallion architecture","Data catalog","Apache Parquet / Avro","Streaming vs batch","Change data capture (CDC)","Data quality (Great Expectations)","Reverse ETL","Schema evolution","Data contracts"]
+  },
+  {
+    id:"analytics", role:"data", label:"Data Analytics & BI",
+    sub:"Stats, visualization & reporting",
+    color:"#FBEAF0", border:"#993556", text:"#72243E", tagBg:"#FBEAF0", tagText:"#72243E",
+    icon:"📊", iconBg:"#993556", iconColor:"#fff",
+    skills:["SQL (advanced)","Python (pandas, numpy)","R (tidyverse, ggplot2)","Tableau","Power BI","Looker","Metabase","Apache Superset","Excel / Google Sheets","Descriptive statistics","Hypothesis testing","Regression analysis","Cohort analysis","Funnel analysis","Retention analysis","Customer segmentation","DAU/MAU/Churn metrics","Dashboarding best practices","Storytelling with data","Statistical significance","Google Analytics","Mixpanel","Amplitude","Attribution modeling"]
+  },
+  {
+    id:"mobile", role:"dev", label:"Mobile Development",
+    sub:"iOS, Android & cross-platform",
+    color:"#E1F5EE", border:"#0F6E56", text:"#085041", tagBg:"#E1F5EE", tagText:"#085041",
+    icon:"📱", iconBg:"#0F6E56", iconColor:"#fff",
+    skills:["React Native","Flutter","Expo","Swift (SwiftUI, UIKit)","Kotlin (Jetpack Compose)","Xcode","Android Studio","App architecture (MVVM, MVI)","State management","Push notifications","Deep linking","In-app purchases","App Store / Play Store publishing","Mobile CI/CD (Fastlane)","Crashlytics","Firebase","Background tasks","Offline support","Bluetooth / NFC","Camera / sensors","Mobile security","Accessibility (iOS/Android)"]
+  },
+  {
+    id:"arch", role:"dev", label:"System Design & Architecture",
+    sub:"Scalability, patterns & distributed systems",
+    color:"#F1EFE8", border:"#5F5E5A", text:"#444441", tagBg:"#F1EFE8", tagText:"#444441",
+    icon:"◈", iconBg:"#5F5E5A", iconColor:"#fff",
+    skills:["Microservices","Monolithic architecture","Event-driven architecture","CQRS / Event sourcing","Domain-driven design (DDD)","Hexagonal architecture","Service mesh","API gateway","Circuit breaker","Saga pattern","Strangler fig pattern","CAP theorem","Consistency models","Distributed transactions","Sharding & partitioning","Caching strategies","Rate limiting","Backpressure","Queue-based load leveling","Health checks","Idempotency","Observability","Capacity planning","Fault tolerance"]
+  },
+  {
+    id:"qa", role:"dev", label:"Testing & Quality",
+    sub:"Unit, integration, E2E & performance",
+    color:"#FCEBEB", border:"#A32D2D", text:"#791F1F", tagBg:"#FCEBEB", tagText:"#791F1F",
+    icon:"✓", iconBg:"#A32D2D", iconColor:"#fff",
+    skills:["Unit testing","Integration testing","E2E testing","Contract testing","Performance testing","Load testing","Stress testing","Chaos testing","Test-driven development (TDD)","BDD (Cucumber, Gherkin)","Jest","Pytest","JUnit","Go test","Cypress","Playwright","Selenium","k6","Locust","JMeter","Postman","Pact (contract)","Code coverage","Mutation testing","Visual regression testing","Accessibility testing"]
+  },
+  {
+    id:"pm", role:"other", label:"Product & Project Management",
+    sub:"Agile, roadmaps & stakeholder management",
+    color:"#E6F1FB", border:"#185FA5", text:"#0C447C", tagBg:"#E6F1FB", tagText:"#0C447C",
+    icon:"⬛", iconBg:"#185FA5", iconColor:"#fff",
+    skills:["Agile / Scrum","Kanban","Sprint planning","Roadmapping","OKRs / KPIs","User story writing","Backlog grooming","Stakeholder management","Requirements gathering","PRD writing","Jira / Linear / Notion","Risk management","Prioritization (RICE, MoSCoW)","Go-to-market","Feature flagging","Product analytics","User research","Competitive analysis","A/B testing","Release management"]
+  },
+  {
+    id:"soft", role:"other", label:"Soft Skills & Engineering Culture",
+    sub:"Communication, leadership & process",
+    color:"#EAF3DE", border:"#3B6D11", text:"#27500A", tagBg:"#EAF3DE", tagText:"#27500A",
+    icon:"♟", iconBg:"#3B6D11", iconColor:"#fff",
+    skills:["Technical writing","Code review culture","Pair programming","Mentoring","On-call / incident response","Blameless post-mortems","RFC / design doc writing","Architecture decision records (ADRs)","Cross-functional collaboration","Presentation skills","Estimation","Technical interviews","Engineering metrics (DORA)","Open source contribution","Documentation-as-code","Feedback culture","Remote-first collaboration","Hiring & interviews"]
+  },
+];
+
+const roles = [
+  {id:"all", label:"All domains"},
+  {id:"dev", label:"Software dev"},
+  {id:"ai", label:"AI / ML"},
+  {id:"data", label:"Data"},
+  {id:"devops", label:"DevOps / Infra"},
+  {id:"other", label:"Product & soft"},
+];
+
+let activeRole = "all";
+let searchQuery = "";
+
+const tabsEl = document.getElementById("tabs");
+const domainsEl = document.getElementById("domains");
+const searchEl = document.getElementById("search");
+
+function renderTabs(){
+  tabsEl.innerHTML = roles.map(r =>
+    `<button class="tab ${r.id===activeRole?'active':''}" onclick="setRole('${r.id}')">${r.label}</button>`
+  ).join("");
+}
+
+function renderDomains(){
+  const q = searchQuery.toLowerCase();
+  let filtered = data.filter(d => {
+    if(activeRole !== "all" && d.role !== activeRole && d.role !== "all") return false;
+    if(!q) return true;
+    return d.label.toLowerCase().includes(q) || d.skills.some(s => s.toLowerCase().includes(q));
+  });
+
+  if(!filtered.length){
+    domainsEl.innerHTML = `<div class="no-results" style="grid-column:1/-1">No skills found for "<strong>${q}</strong>"</div>`;
+    return;
+  }
+
+  domainsEl.innerHTML = filtered.map(d => {
+    const matchedSkills = q
+      ? d.skills.filter(s => s.toLowerCase().includes(q))
+      : d.skills;
+    const showSkills = matchedSkills.slice(0, 30);
+    return `
+      <div class="domain-card">
+        <div class="domain-header">
+          <div class="domain-icon" style="background:${d.iconBg};color:${d.iconColor};font-size:12px;font-weight:500">${d.icon}</div>
+          <div>
+            <div class="domain-title">${d.label}</div>
+            <div class="domain-sub">${d.sub}</div>
+          </div>
+        </div>
+        <div class="skills-list">
+          ${showSkills.map(s => `<span class="skill-tag" style="background:${d.tagBg};color:${d.tagText}">${s}</span>`).join("")}
+        </div>
+        <div class="count">${matchedSkills.length} skill${matchedSkills.length!==1?'s':''}</div>
+      </div>`;
+  }).join("");
+}
+
+function setRole(id){
+  activeRole = id;
+  renderTabs();
+  renderDomains();
+}
+
+searchEl.addEventListener("input", e => {
+  searchQuery = e.target.value;
+  renderDomains();
+});
+
+renderTabs();
+renderDomains();
+</script>

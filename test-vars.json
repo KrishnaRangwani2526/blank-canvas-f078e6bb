@@ -1,0 +1,87 @@
+{
+  "hrId": "0f38c855-b8f9-49da-951c-d5163b136434",
+  "hrEmail": "hr_v2_1776301999288@example.com",
+  "jobId": "83353206-995e-4747-8942-ac788e449fb7",
+  "candidates": [
+    {
+      "id": "e36748fe-f8c9-49fc-97fe-eae1aeaced61",
+      "email": "test_candidate_v2_1776301999287_0@example.com"
+    },
+    {
+      "id": "3a502b8f-aa76-4e17-982e-cb6232e79285",
+      "email": "test_candidate_v2_1776301999287_1@example.com"
+    },
+    {
+      "id": "49dd6c58-eff3-4900-8807-74bfc22d4e01",
+      "email": "test_candidate_v2_1776301999287_2@example.com"
+    },
+    {
+      "id": "36f15085-4b20-46a3-a3e3-088ce2a8b60c",
+      "email": "test_candidate_v2_1776301999287_3@example.com"
+    },
+    {
+      "id": "d74989d1-5b8c-48d6-a4f5-63b76a13cdb1",
+      "email": "test_candidate_v2_1776301999287_4@example.com"
+    },
+    {
+      "id": "9b1cbb3c-55fc-4e1b-b1c8-f2b4ea46bb77",
+      "email": "test_candidate_v2_1776301999287_5@example.com"
+    },
+    {
+      "id": "b859b191-1169-47d2-9e2b-1b9e99746dff",
+      "email": "test_candidate_v2_1776301999287_6@example.com"
+    },
+    {
+      "id": "b892ac30-f9a9-4132-8a63-92ccb4c10820",
+      "email": "test_candidate_v2_1776301999287_7@example.com"
+    },
+    {
+      "id": "2b98b7be-f6c1-4077-a664-4bb503f02230",
+      "email": "test_candidate_v2_1776301999287_8@example.com"
+    },
+    {
+      "id": "97a877c8-3761-4716-a2f1-02395db4b336",
+      "email": "test_candidate_v2_1776301999287_9@example.com"
+    },
+    {
+      "id": "62b77fb6-a8f4-4e8d-b30c-50b1bf5e7097",
+      "email": "test_candidate_v2_1776301999287_10@example.com"
+    },
+    {
+      "id": "19089ee8-5564-48bb-befd-0412664d5030",
+      "email": "test_candidate_v2_1776301999287_11@example.com"
+    },
+    {
+      "id": "a4e4cd1b-47a5-4b89-9bc4-ab7c58d76e18",
+      "email": "test_candidate_v2_1776301999287_12@example.com"
+    },
+    {
+      "id": "d9b4db4a-c6aa-462f-bb11-813a2f7c6163",
+      "email": "test_candidate_v2_1776301999287_13@example.com"
+    },
+    {
+      "id": "3ae16ae8-1557-4598-91bd-947afd64ad8f",
+      "email": "test_candidate_v2_1776301999287_14@example.com"
+    },
+    {
+      "id": "c3c23afa-a1d0-4815-8529-007be6c46b0a",
+      "email": "test_candidate_v2_1776301999287_15@example.com"
+    },
+    {
+      "id": "6e2eac40-01b2-4eb1-80f1-3ec11494ce53",
+      "email": "test_candidate_v2_1776301999287_16@example.com"
+    },
+    {
+      "id": "77d5cbe3-0dc1-4e84-adf7-1d9d258834db",
+      "email": "test_candidate_v2_1776301999287_17@example.com"
+    },
+    {
+      "id": "11cdb805-f314-483e-ba54-7064c679bffb",
+      "email": "test_candidate_v2_1776301999287_18@example.com"
+    },
+    {
+      "id": "a934267d-ada0-4754-ab73-fa37a0a4b2d5",
+      "email": "test_candidate_v2_1776301999287_19@example.com"
+    }
+  ]
+}

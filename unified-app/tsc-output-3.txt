@@ -1,0 +1,15 @@
+src/components/ATSResultModal.tsx(1,10): error TS1484: 'ATSResult' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/DashboardLayout.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/EditModal.tsx(1,20): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/NavLink.tsx(1,36): error TS1484: 'NavLinkProps' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ResumePreviewModal.tsx(1,10): error TS1484: 'ResumeData' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/form.tsx(4,22): error TS1484: 'ControllerProps' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/form.tsx(4,39): error TS1484: 'FieldPath' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/form.tsx(4,50): error TS1484: 'FieldValues' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/pagination.tsx(5,10): error TS1484: 'ButtonProps' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/sidebar.tsx(3,10): error TS1484: 'VariantProps' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/contexts/AuthContext.tsx(1,58): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/hooks/useCompanyATSAnalysis.ts(4,10): error TS1484: 'ATSResult' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/hooks/useCompanyResumeGeneration.ts(4,10): error TS1484: 'ResumeData' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/hooks/useRanking.ts(2,22): error TS1484: 'JobRankRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/hooks/useRanking.ts(2,38): error TS1484: 'JobRankResponse' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
