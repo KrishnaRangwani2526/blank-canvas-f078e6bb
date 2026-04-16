@@ -13,7 +13,7 @@ import { isGitHubRepoLink, normalizeTechStack } from "@/lib/profile-data";
 
 const SkillsPage = () => {
   const { user, loading: authLoading } = useAuth();
-  const { skills, certificates, projects, refetch } = useProfile();
+  const { skills, certificates, projects } = useProfile();
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;

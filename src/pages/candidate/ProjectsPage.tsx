@@ -182,67 +182,66 @@ const ProjectsPage = () => {
               </Card>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
-                {projects.map((project) => (
-                  <Card key={project.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-5">
-                      {(() => {
-                        const techStack = normalizeTechStack(project.tech_stack);
-                        const isRepo = isGitHubRepoLink(project.project_link);
+                {projects.map((project) => {
+                  const techStack = normalizeTechStack(project.tech_stack);
+                  const isRepo = isGitHubRepoLink(project.project_link);
 
-                        return (
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          {isRepo ? <GitBranch className="h-4 w-4 text-muted-foreground" /> : <FolderGit2 className="h-4 w-4 text-muted-foreground" />}
-                          <h3 className="text-base font-semibold text-foreground">{project.title}</h3>
+                  return (
+                    <Card key={project.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {isRepo ? <GitBranch className="h-4 w-4 text-muted-foreground" /> : <FolderGit2 className="h-4 w-4 text-muted-foreground" />}
+                            <h3 className="text-base font-semibold text-foreground">{project.title}</h3>
+                          </div>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteProject(project.id)} disabled={deletingProj === project.id} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteProject(project.id)} disabled={deletingProj === project.id} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
 
-                      {project.description && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
-                      )}
-
-                      {techStack.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {techStack.map((tech: string) => (
-                            <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                        {project.start_date && <span>{new Date(project.start_date).toLocaleDateString()}</span>}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {project.project_link && (
-                          <a
-                            href={project.project_link}
-                            target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            {isRepo ? "Show Repo" : "Show Project"}
-                          </a>
+                        {project.description && (
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
                         )}
-                        {/* Show "Add Skill" button if just added or always */}
-                        <Button
-                          size="sm" variant="outline"
-                          onClick={() => handleExtractSkills(project)}
-                          disabled={extractingProj === project.id}
-                          className="gap-1 text-xs h-7"
-                        >
-                          <Brain className={`h-3 w-3 ${extractingProj === project.id ? "animate-pulse" : ""}`} />
-                          {extractingProj === project.id ? "Extracting..." : "Add Skill"}
-                        </Button>
-                      </div>
-                        );
-                      })()}
-                    </CardContent>
-                  </Card>
-                ))}
+
+                        {techStack.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {techStack.map((tech: string) => (
+                              <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                          {project.start_date && <span>{new Date(project.start_date).toLocaleDateString()}</span>}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {project.project_link && (
+                            <a
+                              href={project.project_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {isRepo ? "Show Repo" : "Show Project"}
+                            </a>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleExtractSkills(project)}
+                            disabled={extractingProj === project.id}
+                            className="gap-1 text-xs h-7"
+                          >
+                            <Brain className={`h-3 w-3 ${extractingProj === project.id ? "animate-pulse" : ""}`} />
+                            {extractingProj === project.id ? "Extracting..." : "Add Skill"}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>

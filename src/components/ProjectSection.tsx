@@ -15,7 +15,7 @@ interface Props {
 
 const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, refetch }, ref) => {
   const { user } = useAuth();
-  const { extractSkills, isLoading: extractingSkills } = useSkillExtractor();
+  const { extractSkills } = useSkillExtractor();
   useImperativeHandle(ref, () => ({ openAdd: () => { resetForm(); setAdding(true); } }));
   const [editing, setEditing] = useState<Tables<"projects"> | null>(null);
   const [adding, setAdding] = useState(false);

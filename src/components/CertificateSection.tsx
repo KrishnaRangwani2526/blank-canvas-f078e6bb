@@ -1,11 +1,10 @@
 // @ts-nocheck
 import { useState, forwardRef, useImperativeHandle } from "react";
-import { Plus, Award, Pencil, Brain, ExternalLink, Upload } from "lucide-react";
+import { Plus, Award, Pencil, Brain, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkillExtractor } from "@/hooks/useSkillExtractor";
 import { saveExtractedSkills } from "@/lib/profile-data";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 import EditModal, { FormField, FormInput, FormTextarea, SaveButton, DeleteButton } from "./EditModal";
@@ -17,7 +16,7 @@ interface Props {
 
 const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certificates, refetch }, ref) => {
   const { user } = useAuth();
-  const { extractSkills, isLoading: extractingSkills } = useSkillExtractor();
+  const { extractSkills } = useSkillExtractor();
   useImperativeHandle(ref, () => ({ openAdd: () => { resetForm(); setAdding(true); } }));
   const [editing, setEditing] = useState<Tables<"certificates"> | null>(null);
   const [adding, setAdding] = useState(false);
@@ -28,7 +27,6 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
   const [credentialUrl, setCredentialUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [extractingCert, setExtractingCert] = useState<string | null>(null);
-  const [justAdded, setJustAdded] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
   const resetForm = () => { setTitle(""); setIssuer(""); setIssueDate(""); setDescription(""); setCredentialUrl(""); setFile(null); };
@@ -68,9 +66,8 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
       if (error) throw error;
       setEditing(null);
     } else {
-      const { data: newCert, error } = await supabase.from("certificates").insert(data).select().single();
+      const { error } = await supabase.from("certificates").insert(data).select().single();
       if (error) throw error;
-      if (newCert) setJustAdded(newCert.id);
       setAdding(false);
     }
     setSaving(false);
@@ -99,7 +96,6 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
       } else {
         toast.error("No skills were detected from this certificate");
       }
-      setJustAdded(null);
     } catch (error) {
       console.error("Skill extraction failed:", error);
     } finally {
