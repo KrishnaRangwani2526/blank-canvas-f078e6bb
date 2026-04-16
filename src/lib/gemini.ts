@@ -1,59 +1,41 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-// Fallback checking to prevent crashes if key is somehow missing
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-
-export const geminiModel = genAI ? genAI.getGenerativeModel({ model: "gemini-2.0-flash" }) : null;
+import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Utility to generate JSON structured output using Gemini.
- * We enforce returning a JSON string parsing.
+ * Utility to generate JSON structured output using Lovable AI Gateway.
  */
 export async function generateJSONWithGemini(prompt: string): Promise<any> {
-  if (!geminiModel) {
-    throw new Error("Gemini API key is missing or invalid.");
-  }
-  
-  const generationConfig = {
-    temperature: 0.2, // Keep it low for structured data
-    responseMimeType: "application/json",
-  };
+  const { data, error } = await supabase.functions.invoke("ai-generate", {
+    body: {
+      prompt,
+      mode: "json",
+      system: "You are a helpful assistant. Always respond with valid JSON only, no markdown formatting.",
+    },
+  });
 
-  try {
-    const result = await geminiModel.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig,
-    });
-    const responseText = result.response.text();
-    return JSON.parse(responseText);
-  } catch (error) {
-    console.error("Gemini AI error:", error);
-    throw error;
+  if (error) {
+    console.error("AI generate error:", error);
+    throw new Error(error.message || "AI generation failed");
   }
+
+  return data;
 }
 
 /**
- * Utility for general text/markdown generation using Gemini.
+ * Utility for general text/markdown generation using Lovable AI Gateway.
  */
 export async function generateTextWithGemini(prompt: string): Promise<string> {
-  if (!geminiModel) {
-    throw new Error("Gemini API key is missing or invalid.");
+  const { data, error } = await supabase.functions.invoke("ai-generate", {
+    body: {
+      prompt,
+      mode: "text",
+      system: "You are a helpful assistant.",
+    },
+  });
+
+  if (error) {
+    console.error("AI generate error:", error);
+    throw new Error(error.message || "AI generation failed");
   }
 
-  const generationConfig = {
-    temperature: 0.7,
-  };
-
-  try {
-    const result = await geminiModel.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig,
-    });
-    return result.response.text();
-  } catch (error) {
-    console.error("Gemini AI error:", error);
-    throw error;
-  }
+  return data?.text || "";
 }
