@@ -438,7 +438,6 @@ export default function NetworkPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-          </div>
         </main>
       </div>
     </div>
