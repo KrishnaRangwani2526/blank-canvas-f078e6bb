@@ -37,10 +37,10 @@ const LearningPage = () => {
       const { error } = await supabase.from("learning_goals").insert({
         user_id: user!.id,
         title: form.title,
-        link: form.link,
-        deadline: form.deadline_end || null,
+        description: form.link,
+        target_date: form.deadline_end || null,
         proof: form.target_hours ? `Target: ${form.target_hours}hr/day | ${form.deadline_start} to ${form.deadline_end}` : null,
-        completed: false,
+        status: "in_progress",
       });
       if (error) throw error;
     },
@@ -55,8 +55,9 @@ const LearningPage = () => {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, completed }: { id: string; completed: boolean }) => {
-      const { error } = await supabase.from("learning_goals").update({ completed: !completed }).eq("id", id);
+    mutationFn: async ({ id, completed }: { id: string; completed: string }) => {
+      const newStatus = completed ? "in_progress" : "completed";
+      const { error } = await supabase.from("learning_goals").update({ status: newStatus }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
