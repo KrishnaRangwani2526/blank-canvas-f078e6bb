@@ -190,7 +190,7 @@ const ProjectsPage = () => {
             {/* Add Repo Form */}
             {showRepoForm && (
                <ProjectFormCard
-                title="Add GitHub Repo" icon={GitBranch} form={repoForm} setForm={setRepoForm}
+                 title="Add GitHub Repo" icon={GitBranch} form={repoForm}
                  saving={saving}
                  onSave={handleAddRepo} onCancel={() => setShowRepoForm(false)} linkLabel="GitHub Repo Link"
                  onChange={updateRepoForm}
@@ -200,7 +200,7 @@ const ProjectsPage = () => {
             {/* Add Project Form */}
             {showProjectForm && (
                <ProjectFormCard
-                title="Add Project" icon={FolderGit2} form={projectForm} setForm={setProjectForm}
+                 title="Add Project" icon={FolderGit2} form={projectForm}
                  saving={saving}
                  onSave={handleAddProject} onCancel={() => setShowProjectForm(false)} linkLabel="Project Link"
                  onChange={updateProjectForm}
