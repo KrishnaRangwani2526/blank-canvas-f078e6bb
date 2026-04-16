@@ -197,9 +197,9 @@ const ProjectsPage = () => {
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
                       )}
 
-                      {project.tech_stack?.length > 0 && (
+                      {project.tech_stack && (
                         <div className="flex flex-wrap gap-1 mb-3">
-                          {project.tech_stack.map((tech) => (
+                          {(Array.isArray(project.tech_stack) ? project.tech_stack : project.tech_stack.split(",").map(s => s.trim()).filter(Boolean)).map((tech: string) => (
                             <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
                           ))}
                         </div>
