@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "./useProfile";
+import { useStreakData } from "./useStreakData";
 import { toast } from "sonner";
 
 export interface ATSResult {
@@ -21,6 +22,13 @@ export interface ATSResult {
   consistency_score: number;
   recommendations: string[];
   learning_roadmap: string[];
+  streak_analysis?: {
+    github_streak: number;
+    leetcode_streak: number;
+    aspiring_streak: number;
+    consistency_rating: "excellent" | "good" | "moderate" | "low";
+    insight: string;
+  };
   match_percentage?: number;
   matched_skills?: string[];
   missing_skills?: string[];
@@ -30,6 +38,7 @@ export interface ATSResult {
 export function useAtsAnalyzer() {
   const { user } = useAuth();
   const { profile, skills, experience, projects, education } = useProfile(user?.id);
+  const { data: streakData } = useStreakData();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ATSResult | null>(null);
 
@@ -47,6 +56,14 @@ export function useAtsAnalyzer() {
         experience: experience.map((e) => ({ role: e.role, company: e.company, description: e.description })),
         projects: projects.map((p) => ({ title: p.title, description: p.description, tech: p.tech_stack })),
         education: education.map((e) => ({ degree: e.degree, field: e.field_of_study })),
+        streaks: {
+          github_streak: streakData?.github?.streak ?? 0,
+          github_weekly_commits: streakData?.github?.weekly_commits ?? 0,
+          leetcode_streak: streakData?.leetcode?.streak ?? 0,
+          leetcode_weekly_solved: streakData?.leetcode?.weekly_solved ?? 0,
+          aspiring_streak: streakData?.aspiring?.streak ?? 0,
+          aspiring_total_activities: streakData?.aspiring?.total_activities ?? 0,
+        },
       };
 
       const prompt = `You are an expert AI Resume and ATS Analyzer. Your task is to analyze the following candidate profile strictly.
@@ -55,6 +72,8 @@ Candidate Profile JSON:
 ${JSON.stringify(profileContext, null, 2)}
 
 ${jobRequirements ? `Job Requirements to match against:\n${jobRequirements}\n\n` : ''}
+
+IMPORTANT: Factor the streak data heavily into the score and consistency analysis. Higher GitHub/LeetCode/Aspiring streaks indicate strong consistency and active learning — boost the score and consistency_score accordingly. Low or zero streaks should lower consistency and produce specific recommendations to build daily habits.
     
 Provide a detailed JSON response exactly matching this schema:
 {
@@ -70,14 +89,22 @@ Provide a detailed JSON response exactly matching this schema:
   "score_breakdown": [
     {"category": "Skills Quality & Relevance", "score": number, "max": 100, "detail": "string"},
     {"category": "Project Depth & Impact", "score": number, "max": 100, "detail": "string"},
-    {"category": "Work Experience", "score": number, "max": 100, "detail": "string"}
+    {"category": "Work Experience", "score": number, "max": 100, "detail": "string"},
+    {"category": "Coding Consistency (GitHub/LeetCode/Learning Streaks)", "score": number, "max": 100, "detail": "string referencing actual streak numbers"}
   ],
   "profile_gaps": [{"area": "string", "severity": "high" | "medium" | "low", "detail": "string"}],
   "strengths": ["string"],
   "weaknesses": ["string"],
-  "consistency_score": number (0-100),
+  "consistency_score": number (0-100, derived from streaks),
   "recommendations": ["actionable advice 1", ...],
-  "learning_roadmap": ["week 1 plan", ...]
+  "learning_roadmap": ["week 1 plan", ...],
+  "streak_analysis": {
+    "github_streak": ${streakData?.github?.streak ?? 0},
+    "leetcode_streak": ${streakData?.leetcode?.streak ?? 0},
+    "aspiring_streak": ${streakData?.aspiring?.streak ?? 0},
+    "consistency_rating": "excellent" | "good" | "moderate" | "low",
+    "insight": "1-2 sentence insight about the candidate's consistency based on these streaks"
+  }
   ${jobRequirements ? `, "match_percentage": number, "matched_skills": ["string"], "missing_skills": ["string"], "gap_analysis": "string"` : ''}
 }
 Limit score_breakdown categories to 3-5 critical areas. Make the response highly customized to the candidate's actual data. If the profile is largely empty, reflect that with a low score and basic advice. DO NOT INCLUDE MARKDOWN FORMATTING (like \`\`\`json) IN YOUR RESPONSE, JUST THE RAW JSON OBJECT.`;
