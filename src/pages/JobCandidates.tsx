@@ -78,7 +78,14 @@ export default function JobCandidatesPage() {
         return;
       }
 
-      const userIds = applications.map((a) => a.candidate_id);
+      // candidate_id may be null; fall back to user_id (the applicant)
+      const userIds = applications.map((a) => a.candidate_id || a.user_id).filter(Boolean);
+
+      if (userIds.length === 0) {
+        setCandidates([]);
+        setRankLoading(false);
+        return;
+      }
 
       // Fetch profiles and skills for applicants
       const [profilesRes, skillsRes] = await Promise.all([
@@ -127,7 +134,7 @@ export default function JobCandidatesPage() {
 
       // Save ranks and ATS scores back to applications table
       for (const c of ranked) {
-        const app = applications.find((a) => a.candidate_id === c.candidate_id);
+        const app = applications.find((a) => (a.candidate_id || a.user_id) === c.candidate_id);
         if (app) {
           await supabase
             .from("applications")
@@ -149,6 +156,22 @@ export default function JobCandidatesPage() {
       fetchRankedCandidates();
     }
   }, [job]);
+
+  // Realtime subscription: refresh when new applications arrive
+  useEffect(() => {
+    if (!jobId) return;
+    const channel = supabase
+      .channel(`applications-job-${jobId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'applications', filter: `job_id=eq.${jobId}` },
+        () => {
+          if (job) fetchRankedCandidates();
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [jobId, job]);
 
   const handleViewProfile = (candidateId: string) => {
     navigate(`/candidates/${candidateId}`);
