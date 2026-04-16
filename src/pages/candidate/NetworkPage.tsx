@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState } from "react";
-import { DashboardLayout } from "@/components/DashboardLayout";
+import Navbar from "@/components/Navbar";
+import LeftSidebar from "@/components/LeftSidebar";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -148,9 +150,15 @@ export default function NetworkPage() {
     sendMessageMutation.mutate(selectedUser.user_id);
   };
 
+  if (!user) return null;
+
   return (
-    <DashboardLayout>
-      <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="flex">
+        <LeftSidebar />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
@@ -430,6 +438,8 @@ export default function NetworkPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+        </main>
+      </div>
+    </div>
   );
 }
