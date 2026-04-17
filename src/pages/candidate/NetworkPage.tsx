@@ -198,9 +198,13 @@ export default function NetworkPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="flex">
-        <LeftSidebar />
-        <main className="flex-1 p-6 overflow-auto">
+      <div className="flex flex-col md:flex-row gap-6 p-4 md:p-6 max-w-7xl mx-auto w-full">
+        <div className="w-full md:w-56 md:w-64 flex-shrink-0">
+          <div className="md:sticky md:top-20 overflow-visible md:overflow-y-auto md:max-h-[calc(100vh-5rem)] scrollbar-hide">
+            <LeftSidebar />
+          </div>
+        </div>
+        <main className="flex-1 min-w-0 overflow-auto">
           <div className="space-y-6 max-w-5xl mx-auto">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

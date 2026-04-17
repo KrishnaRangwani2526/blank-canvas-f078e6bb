@@ -96,9 +96,9 @@ const SkillsPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          <div className="w-56 md:w-64 flex-shrink-0">
-            <div className="sticky top-20 overflow-y-auto max-h-[calc(100vh-5rem)] scrollbar-hide">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-56 md:w-64 flex-shrink-0">
+            <div className="md:sticky md:top-20 overflow-visible md:overflow-y-auto md:max-h-[calc(100vh-5rem)] scrollbar-hide">
               <LeftSidebar />
             </div>
           </div>
