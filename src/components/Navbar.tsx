@@ -139,7 +139,7 @@ const Navbar = () => {
             </form>
           </div>
 
-          <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide flex-nowrap ml-4 fade-edges py-1">
+          <div className="flex items-center gap-0.5 overflow-x-auto md:overflow-visible scrollbar-hide flex-nowrap ml-4 fade-edges py-1">
 
             <Link to="/jobs" className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <Briefcase className="h-5 w-5" />
