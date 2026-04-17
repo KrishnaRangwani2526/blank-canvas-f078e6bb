@@ -68,17 +68,17 @@ export default function SelectedCandidates() {
       const candidateIds = apps.map((a: any) => a.candidate_id).filter(Boolean);
 
       const [{ data: profiles }, { data: cands }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, avatar_url").in("id", userIds.length ? userIds : ["__none__"]),
-        supabase.from("candidates").select("id, name, email, avatar_url").in("id", candidateIds.length ? candidateIds : ["__none__"]),
+        supabase.from("profiles").select("*").in("user_id", userIds.length ? userIds : ["__none__"]),
+        supabase.from("candidates").select("*").in("id", candidateIds.length ? candidateIds : ["__none__"]),
       ]);
 
       return apps.map((a: any) => {
-        const prof = profiles?.find((p: any) => p.id === a.user_id);
+        const prof = profiles?.find((p: any) => p.user_id === a.user_id || p.id === a.user_id);
         const cand = cands?.find((c: any) => c.id === a.candidate_id);
         return {
           ...a,
-          name: cand?.name || prof?.full_name || "Candidate",
-          email: cand?.email || prof?.email || "hr@gmail.com",
+          name: cand?.name || prof?.full_name || prof?.display_name || a.candidate_name || "Candidate",
+          email: cand?.email || prof?.email || a.candidate_email || "Not Provided",
           avatar_url: cand?.avatar_url || prof?.avatar_url || "",
         };
       });
