@@ -131,7 +131,7 @@ const Navbar = () => {
     <>
       <nav className="sticky top-0 z-50 bg-card border-b shadow-sm" ref={dropdownRef}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 h-14">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <Link to="/" className="text-primary font-bold text-xl tracking-tight">DevConnect</Link>
             <form className="relative hidden sm:block" onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`); }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -139,7 +139,7 @@ const Navbar = () => {
             </form>
           </div>
 
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide flex-nowrap ml-4 fade-edges py-1">
 
             <Link to="/jobs" className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <Briefcase className="h-5 w-5" />
