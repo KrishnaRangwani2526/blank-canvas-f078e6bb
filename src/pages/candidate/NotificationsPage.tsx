@@ -79,6 +79,96 @@ const NotificationsPage = () => {
     }
   });
 
+  // Accept or decline an offer notification
+  const respondToOffer = useMutation({
+    mutationFn: async ({ notification, decision }: { notification: any; decision: "accepted" | "declined" }) => {
+      const meta = notification.metadata || {};
+      if (!meta.application_id) throw new Error("Offer is missing application reference");
+      if (!user) throw new Error("Not signed in");
+
+      // 1. Update application status
+      const { error: appErr } = await supabase
+        .from("applications")
+        .update({ status: decision, updated_at: new Date().toISOString() })
+        .eq("id", meta.application_id);
+      if (appErr) throw appErr;
+
+      // 2. Get candidate name for HR notification
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const candidateName = profile?.full_name || user.email || "A candidate";
+
+      // 3. If accepted — add to employees + experience
+      if (decision === "accepted" && meta.company_id) {
+        await supabase.from("employees").insert({
+          company_id: meta.company_id,
+          name: candidateName,
+          email: user.email || "",
+          role: meta.role || "Employee",
+          status: "active",
+          joined_at: meta.start_date || new Date().toISOString(),
+        });
+        await supabase.from("experience").insert({
+          user_id: user.id,
+          company: meta.company_name || "Company",
+          role: meta.role || "Employee",
+          start_date: (meta.start_date || new Date().toISOString()).slice(0, 10),
+          description: `Joined ${meta.company_name || "company"} as ${meta.role || "Employee"}`,
+        });
+      }
+
+      // 4. Notify HR (find company owner user_id)
+      if (meta.company_id) {
+        const { data: companyRow } = await supabase
+          .from("companies")
+          .select("user_id, name")
+          .eq("id", meta.company_id)
+          .maybeSingle();
+
+        if (companyRow?.user_id) {
+          await supabase.from("notifications").insert({
+            user_id: companyRow.user_id,
+            type: decision === "accepted" ? "offer_accepted" : "offer_declined",
+            title: decision === "accepted" ? "✅ Offer accepted" : "❌ Offer declined",
+            message: `${candidateName} ${decision} the offer for ${meta.role || "the role"}.`,
+            is_read: false,
+            company_id: meta.company_id,
+            metadata: {
+              application_id: meta.application_id,
+              job_id: meta.job_id,
+              candidate_user_id: user.id,
+              candidate_name: candidateName,
+              role: meta.role,
+              decision,
+            },
+          });
+        }
+      }
+
+      // 5. Mark this notification with the decision
+      await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+          metadata: { ...meta, status: decision },
+        })
+        .eq("id", notification.id);
+
+      return decision;
+    },
+    onSuccess: (decision) => {
+      toast.success(decision === "accepted" ? "Offer accepted! HR has been notified." : "Offer declined. HR has been notified.");
+      queryClient.invalidateQueries({ queryKey: ["candidate-notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["candidate-experience"] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || "Failed to respond to offer");
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

@@ -189,14 +189,25 @@ export default function SelectedCandidates() {
         .eq("id", activeApp.id);
       if (updErr) throw updErr;
 
-      // 3. Create notification for the candidate
+      // 3. Create notification for the candidate (with metadata for accept/decline)
       if (activeApp.user_id) {
         await supabase.from("notifications").insert({
           user_id: activeApp.user_id,
           type: "offer",
           title: "🎉 You've received an offer!",
           message: `${company?.name} has sent you an offer for ${offerForm.role}. Compensation: ${offerForm.salary || "TBD"}. Start date: ${offerForm.startDate}.`,
-          read: false,
+          is_read: false,
+          company_id: company?.id ?? null,
+          metadata: {
+            application_id: activeApp.id,
+            job_id: activeJobId,
+            company_id: company?.id,
+            company_name: company?.name,
+            role: offerForm.role,
+            salary: offerForm.salary,
+            start_date: offerForm.startDate,
+            status: "pending",
+          },
         });
       }
 
