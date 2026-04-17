@@ -132,7 +132,7 @@ const NotificationsPage = () => {
           await supabase.from("notifications").insert({
             user_id: companyRow.user_id,
             type: decision === "accepted" ? "offer_accepted" : "offer_declined",
-            title: decision === "accepted" ? "✅ Offer accepted" : "❌ Offer declined",
+            // title omitted — column not present in notifications schema
             message: `${candidateName} ${decision} the offer for ${meta.role || "the role"}.`,
             is_read: false,
             company_id: meta.company_id,

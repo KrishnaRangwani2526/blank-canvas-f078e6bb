@@ -194,7 +194,7 @@ export default function SelectedCandidates() {
         await supabase.from("notifications").insert({
           user_id: activeApp.user_id,
           type: "offer",
-          title: "🎉 You've received an offer!",
+          // title omitted — column not present in notifications schema
           message: `${company?.name} has sent you an offer for ${offerForm.role}. Compensation: ${offerForm.salary || "TBD"}. Start date: ${offerForm.startDate}.`,
           is_read: false,
           company_id: company?.id ?? null,
