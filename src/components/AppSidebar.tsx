@@ -1,4 +1,4 @@
-import { LayoutDashboard, Briefcase, Users, Building, UserCog, ClipboardList, LogOut } from "lucide-react";
+import { LayoutDashboard, Briefcase, Building, ClipboardList, LogOut, UserCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,9 +19,8 @@ import { Button } from "@/components/ui/button";
 const mainItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
-  { title: "Candidates", url: "/candidates", icon: Users },
+  { title: "Selected Candidates", url: "/selected", icon: UserCheck },
   { title: "Employees", url: "/employees", icon: Building },
-  { title: "HR Management", url: "/hr", icon: UserCog },
   { title: "Requests", url: "/requests", icon: ClipboardList },
 ];
 
