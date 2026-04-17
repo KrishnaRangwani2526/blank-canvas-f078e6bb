@@ -21,39 +21,78 @@ const SkillsPage = () => {
 
   const totalSkills = skills.length;
 
-  // Fetch universal rank data: for each skill, how many users have it
+  // Fetch universal rank data: evaluate skill proficiency by comparing this candidate's portfolio vs all other candidates
   const { data: rankData = {} } = useQuery({
     queryKey: ["skill-universal-ranks", user?.id, skills.map(s => s.name).join(",")],
     queryFn: async () => {
-      if (skills.length === 0) return {};
-      // Get all skills across all users to compute ranks
-      const { data: allSkills } = await supabase.from("skills").select("name, user_id");
-      if (!allSkills) return {};
+      if (skills.length === 0 || !user?.id) return {};
 
-      // Count usage per skill name (case-insensitive)
-      const usageMap: Record<string, number> = {};
-      allSkills.forEach(s => {
-        const key = s.name.toLowerCase();
-        usageMap[key] = (usageMap[key] || 0) + 1;
+      // Fetch all projects and certificates to measure skill depth across everyone
+      const [{ data: allProjects }, { data: allCerts }] = await Promise.all([
+        supabase.from("projects").select("user_id, tech_stack, title, description"),
+        supabase.from("certificates").select("user_id, title, issuer")
+      ]);
+
+      const userSkillScores: Record<string, Record<string, number>> = {};
+      const checkMatch = (str: string | null | undefined, skillLower: string) => str?.toLowerCase().includes(skillLower);
+
+      skills.forEach(skillObj => {
+        const lower = skillObj.name.toLowerCase();
+        const scores: Record<string, number> = {};
+
+        // Measure depth in projects
+        allProjects?.forEach(p => {
+          let matches = 0;
+          if (normalizeTechStack(p.tech_stack).some((t: string) => t.toLowerCase() === lower)) matches++;
+          if (checkMatch(p.title, lower)) matches++;
+          if (checkMatch(p.description, lower)) matches++;
+          
+          if (matches > 0) scores[p.user_id] = (scores[p.user_id] || 0) + matches;
+        });
+
+        // Measure depth in certificates
+        allCerts?.forEach(c => {
+          let matches = 0;
+          if (checkMatch(c.title, lower)) matches++;
+          if (checkMatch(c.issuer, lower)) matches++;
+          
+          if (matches > 0) scores[c.user_id] = (scores[c.user_id] || 0) + matches;
+        });
+
+        userSkillScores[skillObj.name] = scores;
       });
 
-      // For universal rank: sort all unique skill names by usage desc, assign rank
-      const sorted = Object.entries(usageMap).sort((a, b) => b[1] - a[1]);
-      const rankMap: Record<string, number> = {};
-      sorted.forEach(([name], i) => { rankMap[name] = i + 1; });
+      const result: Record<string, { usageCount: number; universalRank: number; totalUsers: number }> = {};
+      
+      const currentUserId = user.id;
 
-      const result: Record<string, { usageCount: number; universalRank: number; totalUniqueSkills: number }> = {};
       skills.forEach(s => {
-        const key = s.name.toLowerCase();
+        const scoresObj = userSkillScores[s.name] || {};
+        const scoreList = Object.entries(scoresObj).map(([uid, score]) => ({uid, score}));
+        
+        let myScore = scoresObj[currentUserId];
+        
+        // If they have the skill saved but zero projects matching, give baseline score of 1
+        if (!myScore) {
+           myScore = 1;
+           scoreList.push({ uid: currentUserId, score: 1 });
+        }
+        
+        // Sort descending
+        scoreList.sort((a,b) => b.score - a.score);
+
+        const myRankIndex = scoreList.findIndex(x => x.uid === currentUserId);
+        
         result[s.name] = {
-          usageCount: usageMap[key] || 1,
-          universalRank: rankMap[key] || 0,
-          totalUniqueSkills: sorted.length,
+           usageCount: myScore,
+           universalRank: myRankIndex !== -1 ? myRankIndex + 1 : scoreList.length + 1,
+           totalUsers: scoreList.length || 1
         };
       });
+
       return result;
     },
-    enabled: skills.length > 0,
+    enabled: skills.length > 0 && !!user?.id,
   });
 
   // Determine where each skill comes from
@@ -191,7 +230,7 @@ const SkillsPage = () => {
                           <div className="flex items-center gap-4 flex-shrink-0">
                             {rd && (
                               <span className="text-xs text-muted-foreground hidden sm:flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3" /> {rd.usageCount} user{rd.usageCount !== 1 ? "s" : ""}
+                                <TrendingUp className="h-3 w-3" /> Top {Math.max(1, Math.round((rd.universalRank / rd.totalUsers) * 100))}% Rank
                               </span>
                             )}
                             <span className="text-xs font-medium text-foreground">{portfolioPct}%</span>
@@ -205,7 +244,7 @@ const SkillsPage = () => {
                             <div className="grid grid-cols-3 gap-3">
                               <div className="text-center p-2 rounded-md bg-card border">
                                 <p className="text-lg font-bold text-foreground">{rd?.usageCount || 1}</p>
-                                <p className="text-[10px] text-muted-foreground">Times Used</p>
+                                <p className="text-[10px] text-muted-foreground">Times Used in Profile</p>
                               </div>
                               <div className="text-center p-2 rounded-md bg-card border">
                                 <p className="text-lg font-bold text-foreground">{portfolioPct}%</p>
@@ -213,7 +252,7 @@ const SkillsPage = () => {
                               </div>
                               <div className="text-center p-2 rounded-md bg-card border">
                                 <p className="text-lg font-bold text-foreground">
-                                  {rd ? `#${rd.universalRank}` : "—"}
+                                  {rd ? `#${rd.universalRank} / ${rd.totalUsers}` : "—"}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground">Universal Rank</p>
                               </div>
