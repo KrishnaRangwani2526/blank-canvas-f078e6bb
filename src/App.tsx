@@ -39,6 +39,7 @@ import HRCandidateProfile from './pages/HRCandidateProfilePage';
 import HREmployees from './pages/Employees';
 import HREmployeeRequests from './pages/EmployeeRequests';
 import HRManagement from './pages/HRManagement';
+import HRSelectedCandidates from './pages/SelectedCandidates';
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ function AppRoutes() {
         <Route path="/employees" element={<HREmployees />} />
         <Route path="/requests" element={<HREmployeeRequests />} />
         <Route path="/hr" element={<HRManagement />} />
+        <Route path="/selected" element={<HRSelectedCandidates />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
