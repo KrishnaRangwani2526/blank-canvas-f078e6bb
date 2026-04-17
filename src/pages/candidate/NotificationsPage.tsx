@@ -227,8 +227,41 @@ const NotificationsPage = () => {
                         </div>
                       )}
                       {notification.type === "job_invite" && notification.metadata?.status === 'accepted' && (
-                        <div className="mt-2 text-xs font-semibold text-green-600 flex items-center gap-1">
+                        <div className="mt-2 text-xs font-semibold text-success flex items-center gap-1">
                           <Check className="h-3 w-3" /> Offer Accepted
+                        </div>
+                      )}
+
+                      {/* Offer letter — Accept / Decline */}
+                      {notification.type === "offer" && !["accepted", "declined"].includes(notification.metadata?.status) && (
+                        <div className="mt-4 pt-3 border-t border-primary/20 flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => respondToOffer.mutate({ notification, decision: "accepted" })}
+                            disabled={respondToOffer.isPending}
+                          >
+                            <Check className="h-4 w-4" /> Accept Offer
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-2"
+                            onClick={() => respondToOffer.mutate({ notification, decision: "declined" })}
+                            disabled={respondToOffer.isPending}
+                          >
+                            <X className="h-4 w-4" /> Decline
+                          </Button>
+                        </div>
+                      )}
+                      {notification.type === "offer" && notification.metadata?.status === "accepted" && (
+                        <div className="mt-2 text-xs font-semibold text-success flex items-center gap-1">
+                          <Check className="h-3 w-3" /> You accepted this offer
+                        </div>
+                      )}
+                      {notification.type === "offer" && notification.metadata?.status === "declined" && (
+                        <div className="mt-2 text-xs font-semibold text-destructive flex items-center gap-1">
+                          <X className="h-3 w-3" /> You declined this offer
                         </div>
                       )}
 
