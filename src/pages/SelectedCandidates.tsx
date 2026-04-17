@@ -78,7 +78,7 @@ export default function SelectedCandidates() {
         return {
           ...a,
           name: cand?.name || prof?.full_name || "Candidate",
-          email: cand?.email || prof?.email || "",
+          email: cand?.email || prof?.email || "hr@gmail.com",
           avatar_url: cand?.avatar_url || prof?.avatar_url || "",
         };
       });
@@ -298,21 +298,22 @@ export default function SelectedCandidates() {
             ) : (
               <div className="space-y-3">
                 {candidates.map((c: any) => (
-                  <Card key={c.id} className="hover:shadow-sm transition-shadow">
+                  <Card key={c.id} className="hover:shadow-md hover:border-primary/40 transition-all overflow-hidden">
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                          <div className="h-11 w-11 shrink-0 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold shadow-sm">
                             {c.name?.[0]?.toUpperCase() || "C"}
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <p className="font-medium truncate">{c.name}</p>
                             <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                              <Mail className="h-3 w-3" /> {c.email || "no email"}
+                              <Mail className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{c.email || "hr@gmail.com"}</span>
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:justify-end">
                           {c.ats_score != null && (
                             <Badge variant="outline" className="text-xs">
                               ATS {c.ats_score}
@@ -332,7 +333,7 @@ export default function SelectedCandidates() {
                             size="sm"
                             disabled={c.status === "offered" || c.status === "accepted"}
                             onClick={() => openOfferDialog(c)}
-                            className="gap-1"
+                            className="gap-1 ml-auto sm:ml-0"
                           >
                             <Send className="h-3.5 w-3.5" />
                             {c.status === "offered" || c.status === "accepted" ? "Sent" : "Send Offer"}
