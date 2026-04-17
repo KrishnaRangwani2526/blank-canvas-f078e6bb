@@ -140,10 +140,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-0.5">
-            <Link to="/network" className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
-              <Users className="h-5 w-5" />
-              <span className="text-[10px] mt-0.5 hidden md:block">Network</span>
-            </Link>
+
             <Link to="/jobs" className="flex flex-col items-center px-2.5 py-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors duration-200">
               <Briefcase className="h-5 w-5" />
               <span className="text-[10px] mt-0.5 hidden md:block">Jobs</span>
