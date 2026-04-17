@@ -288,10 +288,10 @@ export default function HRCandidateProfilePage() {
     try {
       // 1. Update application status
       await supabase.from("applications")
-        .update({ status: releaseStatus })
+        .update({ status: releaseStatus === "passed" ? "shortlisted" : "rejected" })
         .eq("job_id", selectedJobId)
         .eq("user_id", profile.user_id);
-o
+
       // 2. Notify candidate
       await supabase.from("notifications").insert({
         user_id: profile.user_id,
@@ -317,6 +317,12 @@ o
     try {
       // Fetch the company info
       const { data: company } = await supabase.from("companies").select("*").eq("id", job.company_id).single();
+
+      // Mark application as 'selected' so candidate appears under Selected Candidates
+      await supabase.from("applications")
+        .update({ status: "selected" })
+        .eq("job_id", selectedJobId)
+        .eq("user_id", profile.user_id);
 
       await supabase.from("notifications").insert({
         user_id: profile.user_id,
