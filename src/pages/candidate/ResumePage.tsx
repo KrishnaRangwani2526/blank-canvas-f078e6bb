@@ -20,14 +20,14 @@ const ResumePage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileText className="h-5 w-5 text-primary" />
               </div>
@@ -38,9 +38,9 @@ const ResumePage = () => {
         </div>
 
         {!showResume ? (
-          <Card className="bg-card border-border p-8 text-center">
+          <Card className="bg-card border-border p-5 sm:p-8 text-center">
             <p className="text-foreground mb-6">Click below to generate your resume based on your profile data</p>
-            <Button onClick={handleGenerate} disabled={loading} className="gap-2">
+            <Button onClick={handleGenerate} disabled={loading} className="gap-2 w-full sm:w-auto">
               {loading ? "Generating..." : "Generate My Resume"}
             </Button>
           </Card>
@@ -48,7 +48,7 @@ const ResumePage = () => {
           <>
             <ResumePreviewModal resume={resume} loading={loading} />
             <div className="text-center mt-8">
-              <Button variant="outline" onClick={() => setShowResume(false)}>
+              <Button variant="outline" onClick={() => setShowResume(false)} className="w-full sm:w-auto">
                 ← Generate again
               </Button>
             </div>

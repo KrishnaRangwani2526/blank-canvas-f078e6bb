@@ -47,7 +47,7 @@ export function TopNavbar() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem className="text-xs text-muted-foreground">{user?.email}</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/dashboard")}>Dashboard</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/")}>Dashboard</DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/hr")}>HR Management</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>Sign Out</DropdownMenuItem>

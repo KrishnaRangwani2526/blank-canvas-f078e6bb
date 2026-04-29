@@ -86,14 +86,14 @@ const LearningPage = () => {
           <Link to="/" className="p-2 rounded-md hover:bg-secondary transition-colors">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">Aspiring Learning</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Aspiring Learning</h1>
         </div>
 
         {goals.length === 0 && !showForm && (
           <Card>
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground mb-4">No learning goals added yet.</p>
-              <Button onClick={() => setShowForm(true)} className="gap-1.5">
+              <Button onClick={() => setShowForm(true)} className="gap-1.5 w-full sm:w-auto">
                 <Plus className="h-4 w-4" /> Add Learning Goal
               </Button>
             </CardContent>
@@ -103,7 +103,7 @@ const LearningPage = () => {
         {(goals.length > 0 || showForm) && (
           <div className="space-y-4">
             {!showForm && (
-              <Button onClick={() => setShowForm(true)} className="gap-1.5">
+              <Button onClick={() => setShowForm(true)} className="gap-1.5 w-full sm:w-auto">
                 <Plus className="h-4 w-4" /> Add Goal
               </Button>
             )}
@@ -118,7 +118,7 @@ const LearningPage = () => {
                   <Input placeholder="Learning link (URL) *" value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} />
                   <div>
                     <p className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1"><Clock className="h-3 w-3" /> Timeline</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <Input type="date" placeholder="Start date" value={form.deadline_start} onChange={(e) => setForm({ ...form, deadline_start: e.target.value })} />
                       <Input type="date" placeholder="End date" value={form.deadline_end} onChange={(e) => setForm({ ...form, deadline_end: e.target.value })} />
                     </div>
@@ -130,11 +130,11 @@ const LearningPage = () => {
                       <span className="text-sm text-muted-foreground">hours / day</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button onClick={() => addMutation.mutate()} disabled={addMutation.isPending}>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button onClick={() => addMutation.mutate()} disabled={addMutation.isPending} className="w-full sm:w-auto">
                       {addMutation.isPending ? "Saving..." : "Save"}
                     </Button>
-                    <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setShowForm(false)} className="w-full sm:w-auto">Cancel</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -143,8 +143,8 @@ const LearningPage = () => {
             {goals.map((goal: any) => (
               <Card key={goal.id} className={goal.status === "completed" ? "opacity-70" : ""}>
                 <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <p className={`text-sm font-semibold text-card-foreground ${goal.status === "completed" ? "line-through" : ""}`}>
                         {goal.title}
                       </p>
@@ -154,12 +154,12 @@ const LearningPage = () => {
                         </a>
                       )}
                       {goal.target_date && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <div className="flex items-start gap-1 text-xs text-muted-foreground mt-1">
                           <Clock className="h-3 w-3" /> Deadline: {goal.target_date}
                         </div>
                       )}
                       {goal.proof && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <div className="flex items-start gap-1 text-xs text-muted-foreground mt-1 break-words">
                           <Target className="h-3 w-3" /> {goal.proof}
                         </div>
                       )}

@@ -103,7 +103,7 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
       <FormField label="Description"><FormTextarea value={description} onChange={setDescription} /></FormField>
       <FormField label="Project Link"><FormInput value={link} onChange={setLink} placeholder="https://..." /></FormField>
       <FormField label="Tech Stack (comma separated)"><FormInput value={techStack} onChange={setTechStack} placeholder="React, Node.js, Python" /></FormField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Start Date"><FormInput type="date" value={startDate} onChange={setStartDate} /></FormField>
         <FormField label="End Date"><FormInput type="date" value={endDate} onChange={setEndDate} /></FormField>
       </div>
@@ -114,7 +114,7 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-card-foreground">Projects</h2>
           {user && (
@@ -133,14 +133,14 @@ const ProjectSection = forwardRef<{ openAdd: () => void }, Props>(({ projects, r
                   <FolderGit2 className="h-5 w-5 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-card-foreground">{project.title}</p>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm font-semibold text-card-foreground break-words min-w-0">{project.title}</p>
                     {project.project_link && (
                       <a href={project.project_link} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     )}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-auto">
+                    <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all ml-auto shrink-0">
                       <button
                         onClick={() => handleExtractSkills(project)}
                         disabled={extractingProj === project.id}

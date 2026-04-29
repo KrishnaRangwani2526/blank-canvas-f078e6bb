@@ -63,6 +63,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/" element={<CandidateDashboard />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="/jobs" element={<CandidateJobs />} />
         <Route path="/analytics" element={<CandidateAnalytics />} />
         <Route path="/rank" element={<CandidateRank />} />
@@ -89,6 +90,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/" element={<HRDashboard />} />
+        <Route path="/dashboard" element={<HRDashboard />} />
         <Route path="/jobs" element={<HRJobs />} />
         <Route path="/jobs/create" element={<HRCreateJob />} />
         <Route path="/jobs/:id" element={<HRJobDetail />} />

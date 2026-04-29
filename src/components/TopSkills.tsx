@@ -7,7 +7,7 @@ const TopSkills = () => {
   const skillNames = skills.map((s) => s.name).filter(Boolean);
 
   return (
-    <div className="bg-card rounded-lg border p-6 animate-fade-in">
+    <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold text-card-foreground">Top Skills</h2>
         <span className="text-xs text-muted-foreground">{skillNames.length} skills</span>
@@ -22,10 +22,10 @@ const TopSkills = () => {
             {skillNames.map((skill) => (
               <span
                 key={skill}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium"
+                className="inline-flex min-w-0 items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium"
               >
                 <Diamond className="h-3 w-3" />
-                {skill}
+                <span className="break-words">{skill}</span>
               </span>
             ))}
           </div>

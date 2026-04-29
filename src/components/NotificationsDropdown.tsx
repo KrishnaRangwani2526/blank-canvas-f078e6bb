@@ -49,7 +49,7 @@ export function NotificationsDropdown() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] sm:w-80">
         {notifications.length === 0 ? (
           <div className="p-4 text-center text-sm text-muted-foreground">No notifications</div>
         ) : (

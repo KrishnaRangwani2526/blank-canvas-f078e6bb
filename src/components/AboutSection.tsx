@@ -35,7 +35,7 @@ const AboutSection = ({ profile, refetch }: Props) => {
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-card-foreground">About</h2>
           {isOwner && (
@@ -46,7 +46,7 @@ const AboutSection = ({ profile, refetch }: Props) => {
         </div>
         {text ? (
           <>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words leading-relaxed">
               {expanded || !isLong ? text : text.slice(0, 200) + "..."}
             </p>
             {isLong && (

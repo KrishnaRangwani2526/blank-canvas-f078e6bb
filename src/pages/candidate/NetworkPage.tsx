@@ -206,19 +206,19 @@ export default function NetworkPage() {
         </div>
         <main className="flex-1 min-w-0 overflow-auto">
           <div className="space-y-6 max-w-5xl mx-auto">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <h1 className="text-2xl font-bold tracking-tight">Network</h1>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Network</h1>
             </div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="discover">Discover</TabsTrigger>
-                <TabsTrigger value="connections">My Network ({activeConnections.length})</TabsTrigger>
-                <TabsTrigger value="requests">Requests {pendingReceived.length > 0 && `(${pendingReceived.length})`}</TabsTrigger>
-                <TabsTrigger value="messages">Messages</TabsTrigger>
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
+                <TabsTrigger value="discover" className="text-xs sm:text-sm">Discover</TabsTrigger>
+                <TabsTrigger value="connections" className="text-xs sm:text-sm">Network ({activeConnections.length})</TabsTrigger>
+                <TabsTrigger value="requests" className="text-xs sm:text-sm">Requests {pendingReceived.length > 0 && `(${pendingReceived.length})`}</TabsTrigger>
+                <TabsTrigger value="messages" className="text-xs sm:text-sm">Messages</TabsTrigger>
               </TabsList>
 
               {/* DISCOVER TAB */}
@@ -284,16 +284,16 @@ export default function NetworkPage() {
                           const partnerId = conn.requester_id === user?.id ? conn.recipient_id : conn.requester_id;
                           const partner = getProfile(partnerId);
                           return (
-                            <div key={conn.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/20 transition-colors">
-                              <div className="flex items-center gap-4">
-                                <img src={partner?.avatar_url || 'https://via.placeholder.com/150'} alt={partner?.full_name || 'User'} className="h-12 w-12 rounded-full object-cover" />
-                                <div>
+                            <div key={conn.id} className="flex flex-col gap-3 p-4 border rounded-lg hover:bg-secondary/20 transition-colors sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex items-center gap-4 min-w-0">
+                                <img src={partner?.avatar_url || 'https://via.placeholder.com/150'} alt={partner?.full_name || 'User'} className="h-12 w-12 rounded-full object-cover shrink-0" />
+                                <div className="min-w-0">
                                   <Link to={`/profile/${partnerId}`} className="font-medium hover:text-primary transition-colors">{partner?.full_name || 'Anonymous User'}</Link>
-                                  <p className="text-sm text-muted-foreground">{partner?.bio || 'No bio'}</p>
+                                  <p className="text-sm text-muted-foreground truncate">{partner?.bio || 'No bio'}</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Button size="sm" variant="outline" onClick={() => { setActiveChatUser(partner || { user_id: partnerId }); setActiveTab("messages"); }}>
+                              <div className="flex items-center gap-2 sm:shrink-0">
+                                <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => { setActiveChatUser(partner || { user_id: partnerId }); setActiveTab("messages"); }}>
                                   <MessageSquare className="h-4 w-4 mr-2" /> Message
                                 </Button>
                                 <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive/10" onClick={() => { if (confirm("Remove this connection?")) updateRequestMutation.mutate({ id: conn.id, status: 'rejected' }); }}>
@@ -321,19 +321,19 @@ export default function NetworkPage() {
                         {pendingReceived.map(conn => {
                           const requester = getProfile(conn.requester_id);
                           return (
-                            <div key={conn.id} className="flex items-center justify-between p-4 border rounded-lg">
-                              <div className="flex items-center gap-4">
-                                <img src={requester?.avatar_url || 'https://via.placeholder.com/150'} alt={requester?.full_name || 'User'} className="h-10 w-10 rounded-full object-cover" />
-                                <div>
+                            <div key={conn.id} className="flex flex-col gap-3 p-4 border rounded-lg sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex items-center gap-4 min-w-0">
+                                <img src={requester?.avatar_url || 'https://via.placeholder.com/150'} alt={requester?.full_name || 'User'} className="h-10 w-10 rounded-full object-cover shrink-0" />
+                                <div className="min-w-0">
                                   <Link to={`/profile/${conn.requester_id}`} className="font-medium hover:text-primary">{requester?.full_name || 'Anonymous User'}</Link>
-                                  <p className="text-xs text-muted-foreground">{requester?.bio}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{requester?.bio}</p>
                                 </div>
                               </div>
                               <div className="flex gap-2">
-                                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => updateRequestMutation.mutate({ id: conn.id, status: 'accepted' })}>
+                                <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700 text-white sm:flex-none" onClick={() => updateRequestMutation.mutate({ id: conn.id, status: 'accepted' })}>
                                   <Check className="h-4 w-4 mr-1" /> Accept
                                 </Button>
-                                <Button size="sm" variant="outline" onClick={() => updateRequestMutation.mutate({ id: conn.id, status: 'rejected' })}>
+                                <Button size="sm" variant="outline" className="flex-1 sm:flex-none" onClick={() => updateRequestMutation.mutate({ id: conn.id, status: 'rejected' })}>
                                   <X className="h-4 w-4 mr-1" /> Decline
                                 </Button>
                               </div>
@@ -354,15 +354,15 @@ export default function NetworkPage() {
                         {pendingSent.map(conn => {
                           const recipient = getProfile(conn.recipient_id);
                           return (
-                            <div key={conn.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
-                              <div className="flex items-center gap-4 opacity-70">
-                                <img src={recipient?.avatar_url || 'https://via.placeholder.com/150'} alt={recipient?.full_name || 'User'} className="h-10 w-10 rounded-full object-cover grayscale" />
-                                <div>
+                            <div key={conn.id} className="flex flex-col gap-3 p-4 border rounded-lg bg-muted/20 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex items-center gap-4 opacity-70 min-w-0">
+                                <img src={recipient?.avatar_url || 'https://via.placeholder.com/150'} alt={recipient?.full_name || 'User'} className="h-10 w-10 rounded-full object-cover grayscale shrink-0" />
+                                <div className="min-w-0">
                                   <span className="font-medium">{recipient?.full_name || 'Anonymous User'}</span>
                                   <p className="text-xs text-muted-foreground">Sent {new Date(conn.created_at).toLocaleDateString()}</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 sm:shrink-0">
                                 <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" /> Pending</Badge>
                                 <Button size="sm" variant="ghost" onClick={() => updateRequestMutation.mutate({ id: conn.id, status: 'rejected' })}>Withdraw</Button>
                               </div>
@@ -379,9 +379,9 @@ export default function NetworkPage() {
               <TabsContent value="messages" className="mt-6">
                 <Card>
                   <CardContent className="p-0">
-                    <div className="flex h-[500px]">
+                    <div className="flex h-[70vh] min-h-[500px] flex-col md:h-[500px] md:flex-row">
                       {/* Conversation list */}
-                      <div className="w-80 border-r overflow-y-auto">
+                      <div className="h-48 border-b overflow-y-auto md:h-auto md:w-80 md:border-b-0 md:border-r">
                         <div className="p-3 border-b">
                           <h3 className="font-semibold text-sm">Conversations</h3>
                         </div>
@@ -417,7 +417,7 @@ export default function NetworkPage() {
                       </div>
                       
                       {/* Chat area */}
-                      <div className="flex-1 flex flex-col">
+                      <div className="flex-1 flex flex-col min-h-0">
                         {activeChatUser ? (
                           <>
                             <div className="p-3 border-b flex items-center gap-3">
@@ -428,7 +428,7 @@ export default function NetworkPage() {
                               <div className="space-y-3">
                                 {activeChatMessages.map(msg => (
                                   <div key={msg.id} className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[70%] px-3 py-2 rounded-xl text-sm ${
+                                    <div className={`max-w-[85%] sm:max-w-[70%] break-words px-3 py-2 rounded-xl text-sm ${
                                       msg.sender_id === user?.id 
                                         ? 'bg-primary text-primary-foreground' 
                                         : 'bg-secondary text-secondary-foreground'

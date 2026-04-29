@@ -38,30 +38,30 @@ const WorkInfo = ({ profile, refetch }: Props) => {
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-6">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-6 min-w-0">
             {profile?.location && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-start gap-2 min-w-0">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Work Location</p>
-                  <p className="text-sm font-medium text-card-foreground">{profile.location}</p>
+                  <p className="text-sm font-medium text-card-foreground break-words">{profile.location}</p>
                 </div>
               </div>
             )}
             {profile?.bio && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-start gap-2 min-w-0">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Currently Learning</p>
-                  <p className="text-sm font-medium text-card-foreground">{profile.bio}</p>
+                  <p className="text-sm font-medium text-card-foreground break-words">{profile.bio}</p>
                 </div>
               </div>
             )}
           </div>
           {isOwner && (
-            <button onClick={openEdit} className="p-1.5 rounded-md hover:bg-secondary transition-colors">
+            <button onClick={openEdit} className="p-1.5 rounded-md hover:bg-secondary transition-colors shrink-0">
               <Pencil className="h-4 w-4 text-muted-foreground" />
             </button>
           )}

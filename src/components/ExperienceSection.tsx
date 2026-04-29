@@ -63,7 +63,7 @@ const ExperienceSection = ({ experience, refetch }: Props) => {
       <FormField label="Role *"><FormInput value={role} onChange={setRole} required /></FormField>
       <FormField label="Description"><FormTextarea value={description} onChange={setDescription} /></FormField>
       <FormField label="Location"><FormInput value={location} onChange={setLocation} /></FormField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Start Date"><FormInput type="date" value={startDate} onChange={setStartDate} /></FormField>
         <FormField label="End Date">
           {isCurrent ? <p className="text-sm text-muted-foreground pt-2">Present</p> : <FormInput type="date" value={endDate} onChange={setEndDate} />}
@@ -80,7 +80,7 @@ const ExperienceSection = ({ experience, refetch }: Props) => {
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-card-foreground">Experience</h2>
           {user && (
@@ -101,11 +101,11 @@ const ExperienceSection = ({ experience, refetch }: Props) => {
                   </div>
                   {i < experience.length - 1 && <div className="w-0.5 flex-1 bg-border mt-2" />}
                 </div>
-                <div className="pb-4 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-card-foreground">{exp.role}</p>
+                <div className="pb-4 flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-card-foreground break-words min-w-0">{exp.role}</p>
                     {user?.id === exp.user_id && (
-                      <button onClick={() => openEdit(exp)} className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-secondary transition-all">
+                      <button onClick={() => openEdit(exp)} className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1 rounded-md hover:bg-secondary transition-all shrink-0">
                         <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                       </button>
                     )}

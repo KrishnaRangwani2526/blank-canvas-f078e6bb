@@ -20,14 +20,14 @@ const AISuggestionsPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                 <Brain className="h-5 w-5 text-destructive" />
               </div>
@@ -38,7 +38,7 @@ const AISuggestionsPage = () => {
         </div>
 
         {!showSuggestions ? (
-          <Card className="bg-card border-border p-8 text-center">
+          <Card className="bg-card border-border p-5 sm:p-8 text-center">
             <p className="text-foreground mb-6">Analyze your profile to get AI-powered suggestions for improvement</p>
             <Button onClick={handleGetSuggestions} disabled={loading} className="gap-2">
               {loading ? "Analyzing..." : "Get AI Suggestions"}
@@ -117,7 +117,7 @@ const AISuggestionsPage = () => {
                             : "bg-blue-50/50 border-l-blue-500 dark:bg-blue-950/20"
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1">
                         <p className="font-semibold text-sm text-foreground">{gap.area}</p>
                         <span
                           className={`text-xs font-bold uppercase px-2 py-1 rounded ${
@@ -139,7 +139,7 @@ const AISuggestionsPage = () => {
             )}
 
             <div className="text-center">
-              <Button variant="outline" onClick={() => setShowSuggestions(false)}>
+              <Button variant="outline" onClick={() => setShowSuggestions(false)} className="w-full sm:w-auto">
                 ← Get suggestions again
               </Button>
             </div>

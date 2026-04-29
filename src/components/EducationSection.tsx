@@ -55,7 +55,7 @@ const EducationSection = forwardRef<{ openAdd: () => void }, Props>(({ education
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-card-foreground">Education</h2>
           {user && (
@@ -70,14 +70,14 @@ const EducationSection = forwardRef<{ openAdd: () => void }, Props>(({ education
           <div className="space-y-4">
             {education.map((edu) => (
               <div key={edu.id} className="flex gap-3 group">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                   <GraduationCap className="h-5 w-5 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-card-foreground">{edu.school}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-card-foreground break-words min-w-0">{edu.school}</p>
                     {user?.id === edu.user_id && (
-                      <button onClick={() => openEdit(edu)} className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-secondary transition-all">
+                      <button onClick={() => openEdit(edu)} className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1 rounded-md hover:bg-secondary transition-all shrink-0">
                         <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                       </button>
                     )}
@@ -96,7 +96,7 @@ const EducationSection = forwardRef<{ openAdd: () => void }, Props>(({ education
           <FormField label="School *"><FormInput value={school} onChange={setSchool} required /></FormField>
           <FormField label="Degree"><FormInput value={degree} onChange={setDegree} /></FormField>
           <FormField label="Field of Study"><FormInput value={field} onChange={setField} /></FormField>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Start Date"><FormInput type="date" value={startDate} onChange={setStartDate} /></FormField>
             <FormField label="End Date"><FormInput type="date" value={endDate} onChange={setEndDate} /></FormField>
           </div>

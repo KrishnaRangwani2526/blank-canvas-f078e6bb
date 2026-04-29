@@ -118,7 +118,7 @@ const ProfileHeader = ({ profile, refetch, onAddEducation, onAddProject, onAddCe
           )}
         </div>
 
-        <div className="relative px-6 pb-5">
+        <div className="relative px-4 sm:px-6 pb-5">
           <div className="relative -mt-16 mb-3 w-fit">
             <img src={profile?.avatar_url || avatarImg} alt={profile?.full_name || "User"} className="w-32 h-32 rounded-full border-4 border-card object-cover" />
             {isOwner && (
@@ -132,17 +132,17 @@ const ProfileHeader = ({ profile, refetch, onAddEducation, onAddProject, onAddCe
           </div>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-card-foreground">{profile?.full_name || "Your Name"}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-card-foreground break-words">{profile?.full_name || "Your Name"}</h1>
                 {isOwner && (
                   <button onClick={openEditName} className="p-1 rounded-md hover:bg-secondary transition-colors" title="Edit name">
                     <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
                 )}
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-muted-foreground text-sm">{profile?.bio || "Add a bio..."}</p>
+              <div className="flex items-start gap-2 mt-1">
+                <p className="text-muted-foreground text-sm break-words">{profile?.bio || "Add a bio..."}</p>
                 {isOwner && (
                   <button onClick={openEditBio} className="p-1 rounded-md hover:bg-secondary transition-colors" title="Edit bio">
                     <Pencil className="h-3 w-3 text-muted-foreground" />
@@ -158,22 +158,22 @@ const ProfileHeader = ({ profile, refetch, onAddEducation, onAddProject, onAddCe
             </div>
 
             {isOwner && (
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                 <button
                   onClick={openEditOpenToWork}
-                  className="px-5 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+                  className="w-full sm:w-auto px-5 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
                 >
                   Open to
                 </button>
                 <div className="relative">
                   <button
                     onClick={() => setShowAddProfile(!showAddProfile)}
-                    className="flex items-center gap-1 px-4 py-2 border rounded-full text-sm font-medium text-card-foreground hover:bg-secondary transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-1 px-4 py-2 border rounded-full text-sm font-medium text-card-foreground hover:bg-secondary transition-colors"
                   >
                     <Plus className="h-4 w-4" /> Add Profile <ChevronDown className="h-3 w-3" />
                   </button>
                   {showAddProfile && (
-                    <div className="absolute right-0 top-full mt-1 w-52 bg-card rounded-lg shadow-lg border p-2 z-[100] animate-fade-in">
+                    <div className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full mt-1 sm:w-52 bg-card rounded-lg shadow-lg border p-2 z-[100] animate-fade-in">
                       <button onClick={() => { setShowAddProfile(false); onAddCertificate?.(); }} className="w-full text-left px-3 py-2 rounded-md hover:bg-secondary text-sm text-card-foreground">🎓 Add Certificate</button>
                       <button onClick={() => { setShowAddProfile(false); onAddProject?.(); }} className="w-full text-left px-3 py-2 rounded-md hover:bg-secondary text-sm text-card-foreground">💻 Add Project</button>
                       <button onClick={() => { setShowAddProfile(false); onAddEducation?.(); }} className="w-full text-left px-3 py-2 rounded-md hover:bg-secondary text-sm text-card-foreground">📚 Add Education</button>

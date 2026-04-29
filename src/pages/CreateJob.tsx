@@ -133,7 +133,7 @@ export default function CreateJob() {
                 <Label>Location</Label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="San Francisco, CA" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Job Type</Label>
                   <Select value={jobType} onValueChange={setJobType}>
@@ -179,15 +179,15 @@ export default function CreateJob() {
             </CardHeader>
             <CardContent className="space-y-3">
               {skills.map((skill, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                <div key={index} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <GripVertical className="hidden sm:block h-4 w-4 text-muted-foreground cursor-grab" />
                   <Input
                     value={skill.name}
                     onChange={(e) => updateSkill(index, "name", e.target.value)}
                     placeholder="e.g. React, Python, AWS..."
                     className="flex-1"
                   />
-                  <div className="flex items-center gap-2 w-32">
+                  <div className="flex items-center gap-2 sm:w-32">
                     <Label className="text-xs text-muted-foreground whitespace-nowrap">Priority</Label>
                     <Input
                       type="number"
@@ -216,7 +216,7 @@ export default function CreateJob() {
                 { label: "Kaggle", enabled: kaggleEnabled, setEnabled: setKaggleEnabled, weight: kaggleWeight, setWeight: setKaggleWeight },
                 { label: "LeetCode", enabled: leetcodeEnabled, setEnabled: setLeetcodeEnabled, weight: leetcodeWeight, setWeight: setLeetcodeWeight },
               ].map((platform) => (
-                <div key={platform.label} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                <div key={platform.label} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/50 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
                     <Switch checked={platform.enabled} onCheckedChange={platform.setEnabled} />
                     <span className="font-medium text-sm">{platform.label} Requirement</span>
@@ -246,9 +246,9 @@ export default function CreateJob() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>{loading ? "Creating..." : "Create Job Opening"}</Button>
-            <Button type="button" variant="outline" onClick={() => navigate("/jobs")}>Cancel</Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">{loading ? "Creating..." : "Create Job Opening"}</Button>
+            <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => navigate("/jobs")}>Cancel</Button>
           </div>
         </form>
       </div>

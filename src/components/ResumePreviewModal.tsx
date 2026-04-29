@@ -78,14 +78,14 @@ export function ResumePreviewModal({ resume, loading }: ResumePreviewModalProps)
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <Button onClick={handleDownloadPDF} disabled={downloading} size="sm" className="gap-2">
+        <Button onClick={handleDownloadPDF} disabled={downloading} size="sm" className="gap-2 w-full sm:w-auto">
           {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           {downloading ? "Preparing..." : "Download PDF"}
         </Button>
       </div>
       <Card className="bg-card border-border overflow-hidden">
-        <CardContent className="p-4 space-y-3 text-xs max-h-[600px] overflow-y-auto">
-          <div ref={resumeRef} className="bg-white text-black p-6 space-y-3">
+        <CardContent className="p-2 sm:p-4 space-y-3 text-xs max-h-[600px] overflow-auto">
+          <div ref={resumeRef} className="min-w-[620px] bg-white text-black p-6 space-y-3">
             {/* Header */}
             <div className="border-b border-gray-300 pb-2">
               <h1 className="text-lg font-bold">{resume.name}</h1>

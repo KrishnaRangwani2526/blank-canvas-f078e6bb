@@ -165,7 +165,7 @@ const PublicProfilePage = () => {
         {/* Header */}
         <div className="bg-card rounded-lg border p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+              <div className="flex items-start gap-4 min-w-0">
               <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-primary/20">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -173,9 +173,9 @@ const PublicProfilePage = () => {
                   <User className="h-10 w-10 text-muted-foreground" />
                 )}
               </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold text-foreground">{profile.full_name || "User"}</h1>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground break-words">{profile.full_name || "User"}</h1>
                   {candidateOverallRank && (
                     <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 font-semibold gap-1 px-2 py-0.5 whitespace-nowrap">
                       <Trophy className="h-3 w-3" /> Universal Rank #{candidateOverallRank.universal_rank}
@@ -183,7 +183,7 @@ const PublicProfilePage = () => {
                   )}
                 </div>
                 {profile.bio && <p className="text-sm text-muted-foreground">{profile.bio}</p>}
-                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-muted-foreground">
                   {profile.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {profile.location}</span>}
                   {profile.open_to_work && <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">Open to Work</Badge>}
                 </div>
@@ -192,7 +192,7 @@ const PublicProfilePage = () => {
 
             {/* Actions for other users */}
             {!isOwnProfile && user && (
-              <div className="flex w-full sm:w-auto gap-2">
+              <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto">
                 {!connectionStatus && (
                   <Button onClick={() => sendRequestMutation.mutate()} disabled={sendRequestMutation.isPending} className="flex-1 sm:flex-none gap-2">
                     <UserPlus className="h-4 w-4" /> Connect
@@ -233,7 +233,7 @@ const PublicProfilePage = () => {
             <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Diamond className="h-5 w-5 text-primary" /> Skills
             </h2>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {skills.map(s => {
                 let skillRank = null;
                 if (universalRanking?.skill_rankings?.[s.name]) {
@@ -290,8 +290,8 @@ const PublicProfilePage = () => {
                 const projectCommentsList = allComments.filter((c: any) => c.project_id === p.id);
                 return (
                   <div key={p.id} className="border rounded-lg p-5 bg-background">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-base font-semibold">{p.title}</h3>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start mb-2">
+                      <h3 className="text-base font-semibold break-words">{p.title}</h3>
                       {p.project_link && (
                         <a href={p.project_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                           View Live ↗
@@ -330,14 +330,14 @@ const PublicProfilePage = () => {
                               ))
                             )}
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col gap-2 sm:flex-row">
                             <Textarea 
                               placeholder="Leave a comment on this project..."
                               className="min-h-[40px] text-sm"
                               value={projectComments[p.id] || ""}
                               onChange={(e) => setProjectComments({ ...projectComments, [p.id]: e.target.value })}
                             />
-                            <Button size="icon" className="shrink-0" onClick={() => handleAddComment(p.id)} disabled={addCommentMutation.isPending}>
+                            <Button size="icon" className="h-10 w-full shrink-0 sm:w-10" onClick={() => handleAddComment(p.id)} disabled={addCommentMutation.isPending}>
                               <Send className="h-4 w-4" />
                             </Button>
                           </div>

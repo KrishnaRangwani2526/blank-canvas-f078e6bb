@@ -30,10 +30,10 @@ export function ATSResultModal({ result, loading, title = "ATS Analysis" }: ATSR
       {/* Main Score */}
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs text-muted-foreground mb-1">ATS Score</p>
-              <p className="text-4xl font-bold text-primary">{result.ats_score}/100</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary">{result.ats_score}/100</p>
             </div>
             <TrendingUp className="h-10 w-10 text-primary/50" />
           </div>
@@ -99,7 +99,7 @@ export function ATSResultModal({ result, loading, title = "ATS Analysis" }: ATSR
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div className="text-center p-2 rounded-lg bg-card border border-border">
                 <GitBranch className="h-4 w-4 mx-auto mb-1 text-foreground" />
                 <p className="text-lg font-bold text-primary">{result.streak_analysis.github_streak}</p>

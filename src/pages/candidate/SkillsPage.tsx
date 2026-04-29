@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import LeftSidebar from "@/components/LeftSidebar";
 import { useProfile } from "@/hooks/useProfile";
@@ -15,6 +15,15 @@ const SkillsPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { skills, certificates, projects } = useProfile();
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) return;
+    const scrollTimer = window.setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+    return () => window.clearTimeout(scrollTimer);
+  }, []);
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -142,7 +151,7 @@ const SkillsPage = () => {
             </div>
           </div>
 
-          <div className="flex-1 min-w-0 space-y-4">
+          <div ref={contentRef} className="flex-1 min-w-0 space-y-4 scroll-mt-20">
             {/* Header */}
             <div>
               <h1 className="text-2xl font-bold text-foreground">Skills Dashboard</h1>
@@ -241,7 +250,7 @@ const SkillsPage = () => {
                         {isExpanded && (
                           <div className="px-5 pb-4 pt-1 bg-secondary/10 space-y-3">
                             {/* Stats row */}
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div className="text-center p-2 rounded-md bg-card border">
                                 <p className="text-lg font-bold text-foreground">{rd?.usageCount || 1}</p>
                                 <p className="text-[10px] text-muted-foreground">Times Used in Profile</p>
@@ -265,7 +274,7 @@ const SkillsPage = () => {
                                 {sources.map((src, i) => (
                                   <div key={i} className="flex items-center gap-2 text-xs text-foreground">
                                     <src.icon className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                                    <span>{src.label}</span>
+                                    <span className="break-words">{src.label}</span>
                                   </div>
                                 ))}
                               </div>

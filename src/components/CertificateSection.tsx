@@ -153,7 +153,7 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
 
   return (
     <>
-      <div className="bg-card rounded-lg border p-6 animate-fade-in">
+      <div className="bg-card rounded-lg border p-4 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-card-foreground">Licenses & Certifications</h2>
           {user && (
@@ -186,10 +186,10 @@ const CertificateSection = forwardRef<{ openAdd: () => void }, Props>(({ certifi
                     <Award className="h-5 w-5 text-rank-gold" />
                   </div>
                 )}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-card-foreground">{cert.title}</p>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-card-foreground break-words min-w-0">{cert.title}</p>
+                    <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all shrink-0">
                       {user?.id === cert.user_id && (
                         <button onClick={() => openEdit(cert)} className="p-1 rounded-md hover:bg-secondary transition-all">
                           <Pencil className="h-3.5 w-3.5 text-muted-foreground" />

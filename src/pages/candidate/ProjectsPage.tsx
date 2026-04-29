@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import LeftSidebar from "@/components/LeftSidebar";
 import { useProfile } from "@/hooks/useProfile";
@@ -52,9 +52,9 @@ const ProjectFormCard = ({ title, icon: Icon, form, saving, linkLabel, onSave, o
         <Input placeholder="Tech Stack (comma separated)" value={form.tech_stack} onChange={(e) => onChange("tech_stack", e.target.value)} />
         <Input placeholder={linkLabel} value={form[linkField] || ""} onChange={(e) => onChange(linkField, e.target.value)} />
         <Input type="date" placeholder="Date" value={form.start_date} onChange={(e) => onChange("start_date", e.target.value)} />
-        <div className="flex gap-2">
-          <Button type="button" onClick={onSave} disabled={saving}>{saving ? "Saving..." : title === "Add GitHub Repo" ? "Add Repo" : "Add Project"}</Button>
-          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="button" onClick={onSave} disabled={saving} className="w-full sm:w-auto">{saving ? "Saving..." : title === "Add GitHub Repo" ? "Add Repo" : "Add Project"}</Button>
+          <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto">Cancel</Button>
         </div>
       </CardContent>
     </Card>
@@ -67,6 +67,7 @@ const ProjectsPage = () => {
   const { extractSkills } = useSkillExtractor();
   const [extractingProj, setExtractingProj] = useState<string | null>(null);
   const [deletingProj, setDeletingProj] = useState<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Form states
   const [showRepoForm, setShowRepoForm] = useState(false);
@@ -75,6 +76,14 @@ const ProjectsPage = () => {
   const [projectForm, setProjectForm] = useState({ title: "", description: "", tech_stack: "", project_link: "", start_date: "" });
   const [saving, setSaving] = useState(false);
   const [justAdded, setJustAdded] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) return;
+    const scrollTimer = window.setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+    return () => window.clearTimeout(scrollTimer);
+  }, []);
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   if (!user) return <Navigate to="/auth" replace />;
@@ -171,17 +180,17 @@ const ProjectsPage = () => {
             </div>
           </div>
 
-          <div className="flex-1 min-w-0 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
+          <div ref={contentRef} className="flex-1 min-w-0 space-y-4 scroll-mt-20">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <h1 className="text-2xl font-bold text-foreground">Projects</h1>
                 <p className="text-muted-foreground text-sm">Manage projects and extract skills</p>
               </div>
-              <div className="flex gap-2">
-                <Button onClick={() => { setShowRepoForm(true); setShowProjectForm(false); }} variant="outline" className="gap-1.5">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:shrink-0">
+                <Button onClick={() => { setShowRepoForm(true); setShowProjectForm(false); }} variant="outline" className="gap-1.5 w-full sm:w-auto">
                   <GitBranch className="h-4 w-4" /> Add GitHub Repo
                 </Button>
-                <Button onClick={() => { setShowProjectForm(true); setShowRepoForm(false); }} className="gap-1.5">
+                <Button onClick={() => { setShowProjectForm(true); setShowRepoForm(false); }} className="gap-1.5 w-full sm:w-auto">
                   <Plus className="h-4 w-4" /> Add Project
                 </Button>
               </div>
@@ -224,10 +233,10 @@ const ProjectsPage = () => {
                   return (
                     <Card key={project.id} className="hover:shadow-md transition-shadow">
                       <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-start gap-2 min-w-0">
                             {isRepo ? <GitBranch className="h-4 w-4 text-muted-foreground" /> : <FolderGit2 className="h-4 w-4 text-muted-foreground" />}
-                            <h3 className="text-base font-semibold text-foreground">{project.title}</h3>
+                            <h3 className="text-base font-semibold text-foreground break-words min-w-0">{project.title}</h3>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => handleDeleteProject(project.id)} disabled={deletingProj === project.id} className="h-8 w-8 p-0 text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
@@ -250,13 +259,13 @@ const ProjectsPage = () => {
                           {project.start_date && <span>{new Date(project.start_date).toLocaleDateString()}</span>}
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                           {project.project_link && (
                             <a
                               href={project.project_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
                               {isRepo ? "Show Repo" : "Show Project"}
@@ -267,7 +276,7 @@ const ProjectsPage = () => {
                             variant="outline"
                             onClick={() => handleExtractSkills(project)}
                             disabled={extractingProj === project.id}
-                            className="gap-1 text-xs h-7"
+                            className="gap-1 text-xs h-8 w-full sm:h-7 sm:w-auto"
                           >
                             <Brain className={`h-3 w-3 ${extractingProj === project.id ? "animate-pulse" : ""}`} />
                             {extractingProj === project.id ? "Extracting..." : "Add Skill"}

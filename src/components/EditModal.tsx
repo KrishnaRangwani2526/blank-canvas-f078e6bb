@@ -13,9 +13,9 @@ const EditModal = ({ title, open, onClose, children }: EditModalProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4" onClick={onClose}>
       <div
-        className="bg-card rounded-lg border shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto animate-fade-in"
+        className="bg-card rounded-t-lg sm:rounded-lg border shadow-xl w-full max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-y-auto animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-card z-10">

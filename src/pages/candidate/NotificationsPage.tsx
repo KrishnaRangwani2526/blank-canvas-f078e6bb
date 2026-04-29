@@ -201,14 +201,14 @@ const NotificationsPage = () => {
                     : "border-primary/30 bg-primary/[0.03] shadow-sm"
                 }`}
               >
-                <CardHeader className="flex flex-row items-start justify-between gap-4 py-4">
-                  <div className={`flex items-start gap-3 flex-1 ${notification.is_read ? 'opacity-60' : 'opacity-100'}`}>
+                <CardHeader className="flex flex-col gap-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className={`flex items-start gap-3 flex-1 min-w-0 ${notification.is_read ? 'opacity-60' : 'opacity-100'}`}>
                     <Circle className={`h-3 w-3 mt-1.5 shrink-0 ${notification.is_read ? "text-muted-foreground" : "fill-primary text-primary"}`} />
                     <div className="space-y-1 w-full">
                       <CardTitle className={`text-sm ${notification.is_read ? "font-medium text-muted-foreground" : "font-semibold"}`}>
                         {notification.type || "Update"}
                       </CardTitle>
-                      <p className={`text-sm ${notification.is_read ? "text-muted-foreground" : "text-foreground/90"}`}>
+                      <p className={`text-sm break-words ${notification.is_read ? "text-muted-foreground" : "text-foreground/90"}`}>
                         {notification.message}
                       </p>
                       <p className="text-xs text-muted-foreground pt-1">{new Date(notification.created_at).toLocaleString()}</p>
@@ -268,13 +268,13 @@ const NotificationsPage = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 sm:justify-end">
                     {!notification.is_read && (
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={() => markRead.mutate(notification.id)} 
-                        className="shrink-0 h-8 text-xs font-medium text-primary hover:bg-primary/10"
+                        className="shrink-0 h-8 flex-1 sm:flex-none text-xs font-medium text-primary hover:bg-primary/10"
                       >
                         Mark as read
                       </Button>

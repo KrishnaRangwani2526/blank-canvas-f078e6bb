@@ -106,8 +106,8 @@ const RankPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="bg-card rounded-xl border p-8 text-center">
+      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+        <div className="bg-card rounded-xl border p-5 sm:p-8 text-center">
           <div className="w-20 h-20 mx-auto rounded-full bg-rank-bg flex items-center justify-center mb-4">
             <Trophy className="h-10 w-10 text-rank-gold" />
           </div>
@@ -120,7 +120,7 @@ const RankPage = () => {
               ? "Add skills to get ranked" 
               : topPercentageText || "Keep adding skills to improve your rank"}
           </p>
-          <div className="mt-8 grid grid-cols-3 gap-4">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               ["Skills", mySkillsCount], 
               ["Projects", projectCount], 

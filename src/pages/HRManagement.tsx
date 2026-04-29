@@ -21,9 +21,9 @@ export default function HRManagement() {
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-heading font-bold">HR Management</h1>
-          <Button className="gap-2" onClick={() => toast.info("HR member invitation will be available soon.")}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-xl sm:text-2xl font-heading font-bold">HR Management</h1>
+          <Button className="gap-2 w-full sm:w-auto" onClick={() => toast.info("HR member invitation will be available soon.")}>
             <UserPlus className="h-4 w-4" /> Add HR Member
           </Button>
         </div>
@@ -40,17 +40,17 @@ export default function HRManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {hrMembers.map((hr) => (
               <Card key={hr.id}>
-                <CardContent className="p-5 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-bold text-primary">{hr.name[0]}</span>
+                <CardContent className="p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-bold text-primary">{hr.name?.[0]?.toUpperCase() || "H"}</span>
                     </div>
-                    <div>
-                      <p className="font-heading font-semibold">{hr.name}</p>
-                      <p className="text-xs text-muted-foreground">{hr.email}</p>
+                    <div className="min-w-0">
+                      <p className="font-heading font-semibold truncate">{hr.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{hr.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="secondary">{hr.role}</Badge>
                     <Badge variant={hr.status === "active" ? "default" : "secondary"} className="capitalize">{hr.status}</Badge>
                   </div>

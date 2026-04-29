@@ -101,7 +101,7 @@ const JobsPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
         <div className="flex items-center gap-3 mb-6">
           <Briefcase className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold text-foreground">Jobs</h1>
@@ -139,8 +139,8 @@ const JobsPage = () => {
                 <Card key={job.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-6 space-y-3">
                     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                      <div className="flex-1">
-                        <p className="text-xl font-semibold text-foreground">{job.title}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-lg sm:text-xl font-semibold text-foreground break-words">{job.title}</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           {job.location || "Remote"} · {job.work_mode} · {job.job_type}
                         </p>
@@ -148,9 +148,10 @@ const JobsPage = () => {
                           {job.description || "No description available."}
                         </p>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-col items-stretch gap-2 md:items-end">
                         {!isApplied ? (
                           <Button
+                            className="w-full md:w-auto"
                             onClick={() => applyMutation.mutate(job.id)}
                             disabled={applyMutation.isPending}
                           >
